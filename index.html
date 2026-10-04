@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5c1b23"><meta name="description" content="Ghar Kharcha Online — cloud household cash register">
+<link rel="manifest" href="manifest.webmanifest"><title>Ghar Kharcha Online</title>
+<style>
+:root{--paper:#f3ecdc;--paper2:#ebe2cc;--card:#fbf8ef;--ink:#2b2420;--soft:#6b6154;--maroon:#7a2530;--dark:#5c1b23;--gold:#a6813c;--sage:#4f6b4f;--rust:#b5533c;--rule:#c9bb9c;--shadow:0 10px 30px rgba(68,43,28,.08)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#eee4cf,var(--paper));color:var(--ink);font-family:Georgia,serif;min-height:100vh}.shell{width:min(980px,100%);margin:auto;padding:16px}.topline{height:7px;border-top:3px double var(--gold);border-bottom:1px solid var(--gold);margin-bottom:14px}.hero{text-align:center;padding:6px 0 18px}.eyebrow{font:11px ui-monospace,monospace;letter-spacing:3px;color:var(--maroon);text-transform:uppercase}.hero h1{margin:6px 0 3px;font-size:34px;color:var(--dark);letter-spacing:.2px}.sub{color:var(--soft);font-size:14px}.card{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:16px;margin:0 0 14px;box-shadow:var(--shadow)}.card h2{font-size:18px;color:var(--dark);margin:0 0 12px}.toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between}.toolbar .who{min-width:0}.toolbar .who b{font-size:15px}.toolbar .who small{display:block;color:var(--soft);margin-top:2px}.btn{border:0;border-radius:6px;padding:11px 13px;background:var(--maroon);color:#fff7e9;font-weight:700;cursor:pointer;font-size:13px}.btn.secondary{background:var(--paper2);color:var(--ink)}.btn.ghost{background:transparent;border:1px solid var(--maroon);color:var(--maroon)}.btn.danger{background:var(--rust)}.btn:disabled{opacity:.5;cursor:not-allowed}.tabs{display:flex;gap:7px;margin-bottom:14px}.tabs button{flex:1}.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.full{grid-column:1/-1}.field label{display:block;font:10px ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase;color:var(--soft);margin:0 0 5px}.field input,.field select{width:100%;padding:11px;border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);font-size:15px}.field input:focus,.field select:focus{outline:2px solid rgba(166,129,60,.25);border-color:var(--gold)}.message{margin-top:9px;font:12px ui-monospace,monospace}.error{color:var(--rust)}.ok{color:var(--sage)}.setup-note{padding:10px 12px;background:#f3e4c4;border:1px solid var(--gold);border-radius:6px;font-size:12px;color:var(--soft);margin-bottom:12px}.setup-note b{color:var(--dark)}.wallets{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wallet{border-radius:9px;padding:17px;color:#f8f0df;box-shadow:var(--shadow);position:relative;overflow:hidden}.wallet:after{content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.2);border-radius:6px;pointer-events:none}.wallet.fund{background:linear-gradient(135deg,#3e5240,#4f6b4f)}.wallet.reserve{background:linear-gradient(135deg,#5c1b23,#7a2530)}.wallet .label{font:10px ui-monospace,monospace;letter-spacing:2px;text-transform:uppercase;opacity:.8}.wallet .amount{font-size:34px;font-weight:900;margin:4px 0 12px}.wallet .actions{display:flex;gap:7px;flex-wrap:wrap}.wallet input{min-width:0;flex:1;padding:9px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:white;border-radius:5px}.wallet input::placeholder{color:rgba(255,255,255,.65)}.wallet .btn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3)}.wallet small{display:block;opacity:.72;margin-top:8px;font-size:10px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.stat{background:var(--paper2);padding:12px;border-radius:7px}.stat span{font:10px ui-monospace,monospace;color:var(--soft);text-transform:uppercase}.stat b{display:block;font:700 20px ui-monospace,monospace;color:var(--dark);margin-top:4px}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--rule);background:#fff;border-radius:999px;padding:8px 10px;color:var(--soft);font:11px ui-monospace,monospace;cursor:pointer}.chip.active{background:var(--sage);border-color:var(--sage);color:#fff}.form-actions{display:flex;gap:8px}.form-actions .btn{flex:1}.filters{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:8px;margin-bottom:12px}.filters input,.filters select{padding:10px;border:1px solid var(--rule);border-radius:6px;background:white}.entry{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:1px solid var(--paper2)}.entry:last-child{border-bottom:0}.entry-left{display:flex;align-items:center;gap:9px;min-width:0}.badge{flex:none;background:var(--sage);color:#fff;padding:4px 6px;border-radius:4px;font:10px ui-monospace,monospace}.entry-text{min-width:0}.entry-text b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.entry-text small{display:block;color:var(--soft);font-size:10.5px;margin-top:2px}.thumb{width:38px;height:38px;border-radius:5px;object-fit:cover;cursor:pointer;border:1px solid var(--rule)}.entry-right{text-align:right;display:flex;align-items:center;gap:8px}.entry-right .amount{font:700 14px ui-monospace,monospace;color:var(--rust);white-space:nowrap}.mini{padding:6px 8px;font-size:11px}.bill{font-size:14px}.empty{text-align:center;padding:25px;color:var(--soft);font-style:italic}.report{display:grid;grid-template-columns:1fr 1fr;gap:7px}.report-row{background:var(--paper2);padding:9px;border-radius:6px}.report-row .rhead{display:flex;justify-content:space-between;font-size:12px}.bar{height:4px;background:rgba(0,0,0,.08);border-radius:3px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;background:var(--sage)}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions .btn{flex:1;min-width:145px}.join-code{font:800 22px ui-monospace,monospace;letter-spacing:4px;color:var(--dark);background:var(--paper2);padding:9px 12px;border-radius:6px;display:inline-block}.modal{position:fixed;inset:0;background:rgba(43,36,32,.65);display:flex;align-items:center;justify-content:center;padding:18px;z-index:20}.modal-box{width:min(500px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:9px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.3)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.modal-head h3{margin:0;color:var(--dark)}.x{background:transparent;color:var(--soft);font-size:20px;padding:3px}.lightbox img{max-width:95vw;max-height:75vh;border-radius:8px}.footer{text-align:center;color:var(--soft);font:10px ui-monospace,monospace;padding:12px 0 25px}.loading{padding:20px;text-align:center;color:var(--soft)}@media(max-width:700px){.shell{padding:11px}.hero h1{font-size:29px}.wallets{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.grid{grid-template-columns:1fr}.full{grid-column:auto}.report{grid-template-columns:1fr}.toolbar{align-items:flex-start}.toolbar .actions{justify-content:flex-end}.entry-right .delete-label{display:none}}@media(min-width:701px){.main-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.main-grid>.card{margin-bottom:0}}
+.cashbox{background:linear-gradient(135deg,#5c1b23,#7a2530);color:#fbf8ef;border-radius:14px;padding:16px;text-align:center}.cashbox small{display:block;opacity:.85;margin-top:4px}.cashbox b{font-size:34px;display:block}#insights h3{margin:16px 0 8px;font-size:15px;color:var(--maroon)}#insights .stats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.up{color:var(--rust)}.down{color:var(--sage)}
+</style>
+</head>
+<body>
+<div id="globalErr" class="hidden" role="alert" onclick="this.classList.add('hidden')" style="position:fixed;left:8px;right:8px;top:8px;z-index:9999;background:#7a2530;color:#fff;padding:10px 12px;border-radius:10px;font:14px/1.4 system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3);cursor:pointer"></div>
+<div class="shell"><div class="topline"></div><header class="hero"><div class="eyebrow">Cloud Cash Expense Record</div><h1>Ghar Kharcha Online</h1><div class="sub">Ek hisaab — sabke phone par</div></header>
+
+<section id="authCard" class="card">
+  <div class="setup-note"><b>First time?</b> Pehle <button class="btn secondary mini" id="setupBtn">Cloud Setup</button> mein Supabase Project URL + publishable/anon key save karo. Service-role key kabhi mat daalna.</div>
+  <div class="tabs"><button type="button" class="btn" id="loginTab" onclick="showLoginTab()">Login</button><button type="button" class="btn secondary" id="signupTab" onclick="showSignupTab()">Naya Account</button></div>
+  <div id="loginBox"><h2>Login</h2><div class="grid"><div class="field full"><label>Email</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field full"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="btn full" id="loginBtn">Login</button></div></div>
+  <div id="signupBox" class="hidden"><h2>Account Banao</h2><div class="grid"><div class="field full"><label>Name</label><input id="signupName" autocomplete="name"></div><div class="field full"><label>Email</label><input id="signupEmail" type="email" autocomplete="email"></div><div class="field full"><label>Password</label><input id="signupPassword" type="password" minlength="6" autocomplete="new-password"></div><button class="btn full" id="signupBtn">Create Account</button></div></div><div id="authMsg" class="message"></div>
+</section>
+
+<main id="app" class="hidden">
+<section class="card"><div class="toolbar"><div class="who"><b id="userName">—</b><small id="houseInfo">Cloud connected</small></div><div class="actions"><button class="btn secondary mini" id="setupAppBtn">⚙ Setup</button><button class="btn secondary mini" id="refreshBtn">↻ Refresh</button><button class="btn secondary mini" id="logoutBtn">Logout</button></div></div></section>
+<section id="householdCard" class="card"><h2>Family / Household</h2><div class="grid"><div class="field full"><label>Household Name</label><input id="houseName" placeholder="Bhansali Family"></div><button class="btn" id="createHouse">Create Household</button><div class="field"><label>Join Code</label><input id="joinCode" placeholder="ABC123" maxlength="6"></div><button class="btn secondary" id="joinHouse">Join Household</button></div><div id="houseMsg" class="message"></div></section>
+
+<div id="dashboard" class="hidden">
+<section class="wallets">
+  <div class="wallet fund"><div class="label">Kharcha Fund</div><div class="amount">₹<span id="fundAmt">0</span></div><div class="actions"><input id="fundInput" type="number" min="0" placeholder="Amount"><button class="btn" id="fundAdd">+ Add</button><button class="btn" id="fundRemove">− Kam</button></div><small>Har expense isi fund se katega.</small></div>
+  <div class="wallet reserve"><div class="label">Mummy Ka Reserve</div><div class="amount">₹<span id="reserveAmt">0</span></div><div class="actions"><input id="reserveInput" type="number" min="0" placeholder="Amount"><button class="btn" id="reserveAdd">+ Add</button><button class="btn" id="reserveRemove">− Kam</button></div><small>Reserve alag savings hai; expense isse nahi katega.</small></div>
+</section>
+<section class="stats"><div class="stat"><span>Aaj</span><b id="todayTotal">₹0</b></div><div class="stat"><span>Is Month</span><b id="monthTotal">₹0</b></div><div class="stat"><span>Entries</span><b id="entryCount">0</b></div><div class="stat"><span>Bills</span><b id="billCount">0</b></div></section>
+
+<section class="card" id="insights"><h2>Hisaab ek nazar mein</h2>
+<div class="cashbox"><span>Mummy ke paas total cash</span><b>₹<span id="cashTotal">0</span></b><small>Fund ₹<span id="cashFund">0</span> + Reserve ₹<span id="cashReserve">0</span></small></div>
+<div class="stats" style="margin-top:12px"><div class="stat"><span id="lmLabel">Pichhla mahina</span><b id="lmTotal">₹0</b></div><div class="stat"><span>Is mahina</span><b id="tmTotal">₹0</b><small id="tmDiff"></small></div><div class="stat"><span>Last 7 din</span><b id="wkTotal">₹0</b></div><div class="stat"><span>Roz ka average</span><b id="dayAvg">₹0</b></div><div class="stat"><span>Is mahina fund mila</span><b id="fundIn">₹0</b></div><div class="stat"><span>Fund kitne din chalega</span><b id="runway">—</b></div></div>
+<h3>Pichhle 6 mahine ka kharcha</h3><div id="monthBars" class="report"></div>
+<h3 id="lmCatTitle">Pichhle mahine ka category hisaab</h3><div id="lmCats" class="report"></div></section>
+
+<div class="main-grid" style="margin-top:14px">
+<section class="card"><h2>Naya Kharcha</h2><div class="chips" id="chips"></div><div class="grid" style="margin-top:13px"><div class="field"><label>Amount ₹</label><input id="expenseAmount" type="number" min="0" inputmode="decimal"></div><div class="field"><label>Date</label><input id="expenseDate" type="date"></div><div class="field full"><label>Note</label><input id="expenseNote" placeholder="pyaz, aloo, bill no..." maxlength="200"></div><div class="field full"><label>Bill Photo (optional)</label><input id="expensePhoto" type="file" accept="image/*" capture="environment"></div><div class="field full"><label>Bill</label><select id="billSelect"><option value="false">Bill nahi hai</option><option value="true">Bill hai</option></select></div><div class="form-actions full"><button class="btn" id="addExpense">+ Kharcha Jodo</button><button class="btn secondary" id="clearExpense">Clear</button></div></div><div id="expenseMsg" class="message"></div></section>
+
+<section class="card"><h2>Category Report</h2><div id="report" class="report"></div></section>
+</div>
+
+<section class="card"><div class="toolbar"><h2 style="margin:0">Expense Entries</h2><span id="syncState" class="muted">● Cloud</span></div><div class="filters" style="margin-top:12px"><input id="search" placeholder="Search note/category..."><select id="filterCat"><option value="ALL">All categories</option></select><select id="filterMonth"><option value="ALL">All dates</option></select></div><div id="entries"><div class="loading">Loading…</div></div></section>
+<section class="card"><h2>Paisa History</h2><div id="transactions"><div class="empty">No transaction history.</div></div></section>
+<section class="card"><h2>Export & Backup</h2><div class="actions"><button class="btn" id="exportExcel">⬇ Excel</button><button class="btn secondary" id="exportJson">💾 JSON Backup</button><button class="btn secondary" id="copyCode">📋 Copy Join Code</button><button class="btn secondary" id="importBtn">📥 Purana Backup Import</button><input type="file" id="importFile" accept=".json,application/json" class="hidden"></div><div class="message muted" style="margin-top:9px">Cloud database is the main copy. Backup files are an extra safety layer.</div><div id="importMsg" class="message"></div></section>
+</div></main><div class="footer">Ghar Kharcha Online v7 • Cloud synced • Mobile ready</div></div>
+
+<div id="setupModal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h3>Cloud Setup</h3><button class="btn x" id="closeSetup">×</button></div><p class="muted">Supabase Project URL aur publishable/anon key yahan save karo. Ye browser mein localStorage mein rahega.</p><div class="field" style="margin-bottom:10px"><label>Project URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div><div class="field" style="margin-bottom:10px"><label>Publishable / Anon Key</label><input id="cfgKey" placeholder="sb_publishable_... (ya eyJ...)"></div><div class="actions"><button class="btn" id="saveSetup">Save & Connect</button><button class="btn secondary" id="clearSetup">Clear</button></div><div id="setupMsg" class="message"></div></div></div>
+<div id="lightbox" class="modal hidden lightbox" onclick="if(event.target.id==='lightbox')closeLightbox()"><div class="modal-box" style="background:transparent;box-shadow:none;text-align:center"><img id="lightImg"><button class="btn secondary" onclick="closeLightbox()" style="margin-top:10px">Band Karo</button></div></div>
+
+<script>
+/* ===== V5: global error visibility (works even if everything else fails) ===== */
+function showErr(prefix,e){var m=(prefix?prefix+': ':'')+((e&&e.message)?e.message:String(e));var b=document.getElementById('globalErr');if(b){b.textContent=m+'  (tap to close)';b.classList.remove('hidden')}try{console.error(prefix,e)}catch(_){}}
+window.addEventListener('error',function(ev){showErr('JS error',ev.error||ev.message)});
+window.addEventListener('unhandledrejection',function(ev){showErr('Error',ev.reason)});
+var guard=function(fn){return function(){try{var r=fn.apply(this,arguments);if(r&&r.catch)r.catch(function(e){showErr('',e)})}catch(e){showErr('',e)}}};
+
+/* ===== V5: Supabase library is loaded lazily, with timeout + retry; failure never touches the UI ===== */
+let supabaseLoadPromise=null;
+function loadScript(src,ms){return new Promise(function(resolve,reject){var sc=document.createElement('script'),done=false;var t=setTimeout(function(){if(done)return;done=true;sc.remove();reject(new Error('timeout'))},ms||10000);sc.src=src;sc.async=true;sc.onload=function(){if(done)return;done=true;clearTimeout(t);resolve()};sc.onerror=function(){if(done)return;done=true;clearTimeout(t);sc.remove();reject(new Error('blocked/unreachable'))};document.head.appendChild(sc)})}
+function loadSupabase(){
+  if(window.supabase&&typeof window.supabase.createClient==='function') return Promise.resolve(window.supabase);
+  if(supabaseLoadPromise) return supabaseLoadPromise;
+  supabaseLoadPromise=(async function(){
+    var urls=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'],tried=[];
+    for(var i=0;i<urls.length;i++){
+      try{await loadScript(urls[i]);if(window.supabase&&typeof window.supabase.createClient==='function')return window.supabase;tried.push(urls[i].split('/')[2]+': loaded but createClient missing')}
+      catch(e){tried.push(urls[i].split('/')[2]+': '+e.message)}
+    }
+    throw new Error('Supabase library load nahi hui ('+tried.join('; ')+'). Internet/CDN/adblock check karo.');
+  })();
+  supabaseLoadPromise.catch(function(){supabaseLoadPromise=null}); /* allow retry on next click */
+  return supabaseLoadPromise;
+}
+function loadXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  return new Promise((resolve,reject)=>{
+    const urls=['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'];
+    let i=0; const next=()=>{if(i>=urls.length)return reject(new Error('Excel library load nahi hui.')); const sc=document.createElement('script');sc.src=urls[i++];sc.async=true;sc.onload=()=>window.XLSX?resolve(window.XLSX):next();sc.onerror=next;document.head.appendChild(sc)}; next();
+  });
+}
+const CATEGORIES={GR:'Groceries',VG:'Vegetables',FR:'Fruits',MD:'Milk & Dairy',HK:'Housekeeping',MA:'Maid',LG:'LPG',EL:'Electricity',LD:'Laundry',HM:'Home Maintenance',ME:'Medicine (Mummy)',MS:'Miscellaneous'};
+const $=id=>document.getElementById(id); const iso=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);const today=()=>iso(new Date()); const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+let sb=null,user=null,household=null,role=null,expenses=[],transactions=[],wallet={fund:0,reserve:0},selectedCat='GR',channel=null;
+/* ===== V5: safe localStorage + config validation ===== */
+function lsGet(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+function lsSet(k,v){try{localStorage.setItem(k,v);return localStorage.getItem(k)===v}catch(e){return false}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function cleanUrl(u){u=String(u||'').trim().replace(/^["']|["']$/g,'').replace(/\/+$/,'');return u.replace(/\/(rest|auth|storage|realtime)\/v1.*$/,'')}
+function cleanKey(k){return String(k||'').replace(/\s+/g,'').replace(/^["']|["']$/g,'')}
+function urlProblem(u){if(!u)return 'Project URL khali hai';try{var x=new URL(u);if(x.protocol!=='https:')return 'Project URL https:// se shuru hona chahiye';if(x.hostname.indexOf('.')<0)return 'Project URL galat lag raha hai'}catch(e){return 'Project URL valid nahi hai (example: https://xxxx.supabase.co)'}return ''}
+function keyProblem(k){
+  if(!k)return 'Key khali hai';
+  if(/^sb_secret_/i.test(k))return 'Ye SECRET key hai - frontend mein kabhi mat daalo. sb_publishable_... key use karo.';
+  if(k.indexOf('eyJ')===0){try{var pl=JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));if(pl.role==='service_role')return 'Ye service_role key hai - frontend mein kabhi mat daalo. Publishable/anon key use karo.'}catch(e){}return ''}
+  if(/^sb_publishable_/i.test(k))return '';
+  return 'Key format samajh nahi aaya (sb_publishable_... ya eyJ... honi chahiye)';
+}
+function cfg(){var url=cleanUrl(lsGet('gk2_url')),key=cleanKey(lsGet('gk2_key'));if(urlProblem(url)||keyProblem(key))return {url:'',key:'',bad:!!(url||key)};return {url:url,key:key}}
+function message(id,t,ok=false){$(id).textContent=t||'';$(id).className='message '+(ok?'ok':'error')}
+/* ===== V5: ONE place that creates the Supabase client (lazy, once, isolated) ===== */
+let sbPromise=null,authSub=null;
+function resetClient(){try{if(authSub)authSub.unsubscribe()}catch(e){}authSub=null;try{if(channel&&sb)sb.removeChannel(channel)}catch(e){}channel=null;sb=null;sbPromise=null}
+function getSb(){
+  if(sb) return Promise.resolve(sb);
+  if(sbPromise) return sbPromise;
+  sbPromise=(async function(){
+    var c=cfg();
+    if(!c.url||!c.key){var e=new Error('Cloud Setup incomplete - pehle Project URL aur publishable key save karo.');e.needSetup=true;throw e}
+    var lib=await loadSupabase();
+    var client=lib.createClient(c.url,c.key);
+    var r=client.auth.onAuthStateChange(function(event,session){setTimeout(function(){onAuth(event,session)},0)}); /* setTimeout: never run supabase calls inside the callback (deadlock) */
+    authSub=r&&r.data&&r.data.subscription;
+    sb=client;
+    return client;
+  })();
+  sbPromise.catch(function(){sbPromise=null;sb=null});
+  return sbPromise;
+}
+/* V4 bug was here: the callback reloaded the page whenever session was null -> INITIAL_SESSION(null) fires on every load -> endless reload loop */
+function onAuth(event,session){
+  try{
+    if(event==='SIGNED_OUT'){resetSession();return}
+    if(session&&session.user){
+      if(!user||user.id!==session.user.id) afterLogin(session.user).catch(function(e){showErr('Login ke baad error',e)});
+      else user=session.user;
+    }
+  }catch(e){showErr('Auth error',e)}
+}
+function resetSession(){user=null;household=null;role=null;expenses=[];transactions=[];wallet={fund:0,reserve:0};try{if(channel&&sb)sb.removeChannel(channel)}catch(e){}channel=null;$('householdCard').classList.remove('hidden');$('dashboard').classList.add('hidden');showLogin()}
+function init(){
+  renderChips();fillFilters();$('expenseDate').value=today();$('authCard').classList.remove('hidden');
+  var c=cfg();
+  if(c.bad) message('authMsg','Saved Cloud Setup values sahi nahi hain - Cloud Setup mein dobara save karo.');
+  /* UI is already usable here. Supabase loads in background only to restore an existing session. */
+  if(c.url&&c.key) getSb().then(function(client){return client.auth.getSession()}).then(function(r){if(r&&r.data&&r.data.session)onAuth('INITIAL_SESSION',r.data.session)}).catch(function(e){message('authMsg','Supabase connection failed: '+e.message)});
+}
+function renderChips(){ $('chips').innerHTML=Object.entries(CATEGORIES).map(([k,v])=>`<button class="chip ${k===selectedCat?'active':''}" data-cat="${k}">${k} · ${v}</button>`).join('');document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{selectedCat=b.dataset.cat;renderChips()}) }
+function fillFilters(){ $('filterCat').innerHTML='<option value="ALL">All categories</option>'+Object.entries(CATEGORIES).map(([k,v])=>`<option value="${k}">${k} · ${v}</option>`).join('') }
+function showLogin(){ $('authCard').classList.remove('hidden');$('app').classList.add('hidden') }
+function showLoginTab(){ const a=$('loginBox'),b=$('signupBox'),lt=$('loginTab'),st=$('signupTab'); if(!a||!b)return; a.classList.remove('hidden'); b.classList.add('hidden'); if(lt)lt.className='btn'; if(st)st.className='btn secondary'; }
+function showSignupTab(){ const a=$('loginBox'),b=$('signupBox'),lt=$('loginTab'),st=$('signupTab'); if(!a||!b)return; b.classList.remove('hidden'); a.classList.add('hidden'); if(st)st.className='btn'; if(lt)lt.className='btn secondary'; }
+async function afterLogin(u){user=u;$('authCard').classList.add('hidden');$('app').classList.remove('hidden');$('userName').textContent=u.user_metadata?.name||u.email;await loadMembership()}
+async function loadMembership(){const {data,error}=await sb.from('household_members').select('household_id,role,display_name,households(id,name,join_code)').eq('user_id',user.id).maybeSingle();if(error){message('houseMsg',error.message);return}if(!data){household=null;role=null;$('householdCard').classList.remove('hidden');$('dashboard').classList.add('hidden');$('houseInfo').textContent='Household create/join karo';return}household=data.households;role=data.role;$('householdCard').classList.add('hidden');$('dashboard').classList.remove('hidden');$('houseInfo').textContent=`${household.name} · ${role} · Code ${household.join_code}`;await loadData();subscribeRealtime()}
+async function loadData(){if(!household)return;setSync('Syncing…');const [w,e,t]=await Promise.all([sb.from('wallets').select('*').eq('household_id',household.id).single(),sb.from('expenses').select('*').eq('household_id',household.id).order('expense_date',{ascending:false}).order('created_at',{ascending:false}).limit(1000),sb.from('transactions').select('*').eq('household_id',household.id).order('created_at',{ascending:false}).limit(300)]);if(w.error||e.error||t.error){setSync('Sync error');alert((w.error||e.error||t.error).message);return}wallet=w.data||{fund:0,reserve:0};expenses=e.data||[];transactions=t.data||[];renderAll();setSync('● Cloud synced')}
+function setSync(t){$('syncState').textContent=t}
+function subscribeRealtime(){if(channel)sb.removeChannel(channel);channel=sb.channel('gk2-'+household.id).on('postgres_changes',{event:'*',schema:'public',table:'expenses',filter:`household_id=eq.${household.id}`},loadData).on('postgres_changes',{event:'*',schema:'public',table:'wallets',filter:`household_id=eq.${household.id}`},loadData).on('postgres_changes',{event:'*',schema:'public',table:'transactions',filter:`household_id=eq.${household.id}`},loadData).subscribe()}
+function renderAll(){ $('fundAmt').textContent=money(wallet.fund);$('reserveAmt').textContent=money(wallet.reserve);const t=today(),m=t.slice(0,7);const todayTotal=expenses.filter(e=>e.expense_date===t).reduce((s,e)=>s+Number(e.amount),0);const monthTotal=expenses.filter(e=>e.expense_date?.startsWith(m)).reduce((s,e)=>s+Number(e.amount),0);$('todayTotal').textContent='₹'+money(todayTotal);$('monthTotal').textContent='₹'+money(monthTotal);$('entryCount').textContent=expenses.length;$('billCount').textContent=expenses.filter(e=>e.has_bill).length;renderReport();renderFilters();renderEntries();renderTransactions();try{renderInsights()}catch(e){showErr('Insights',e)} }
+function renderInsights(){
+  const t=today(),dt=new Date(t+'T00:00:00'),ym=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  const cm=ym(dt),pd=new Date(dt.getFullYear(),dt.getMonth()-1,1),pm=ym(pd);
+  const sum=f=>expenses.filter(f).reduce((s,e)=>s+Number(e.amount),0),mt=m=>sum(e=>(e.expense_date||'').startsWith(m));
+  const lm=mt(pm),tm=mt(cm),wkFrom=iso(new Date(dt-6*864e5)),wk=sum(e=>e.expense_date>=wkFrom&&e.expense_date<=t),avg=tm/dt.getDate();
+  const fund=Number(wallet.fund||0),res=Number(wallet.reserve||0),fin=transactions.filter(x=>x.type==='fund_add'&&(x.transaction_date||'').startsWith(cm)).reduce((s,x)=>s+Number(x.amount),0);
+  const mn=d=>d.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  $('cashTotal').textContent=money(fund+res);$('cashFund').textContent=money(fund);$('cashReserve').textContent=money(res);
+  $('lmLabel').textContent=mn(pd);$('lmTotal').textContent='₹'+money(lm);$('tmTotal').textContent='₹'+money(tm);
+  $('tmDiff').textContent=lm?'Pichhle mahine ka '+Math.round(tm/lm*100)+'% ho chuka':'';
+  $('wkTotal').textContent='₹'+money(wk);$('dayAvg').textContent='₹'+money(Math.round(avg));$('fundIn').textContent='₹'+money(fin);
+  $('runway').textContent=avg>0?Math.floor(fund/avg)+' din':'—';
+  const ms=[];for(let i=0;i<6;i++){const d=new Date(dt.getFullYear(),dt.getMonth()-i,1);ms.push([mn(d),mt(ym(d))])}const mx=Math.max(...ms.map(x=>x[1]),1);
+  $('monthBars').innerHTML=ms.map(([n,v])=>`<div class="report-row"><div class="rhead"><span>${n}</span><b>₹${money(v)}</b></div><div class="bar"><i style="width:${Math.round(v/mx*100)}%"></i></div></div>`).join('');
+  $('lmCatTitle').textContent=mn(pd)+' ka category hisaab';
+  const tot={};expenses.filter(e=>(e.expense_date||'').startsWith(pm)).forEach(e=>tot[e.category]=(tot[e.category]||0)+Number(e.amount));
+  $('lmCats').innerHTML=Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="report-row"><div class="rhead"><span><b>${k}</b> ${CATEGORIES[k]||''}</span><b>₹${money(v)}</b></div><div class="bar"><i style="width:${lm?Math.round(v/lm*100):0}%"></i></div></div>`).join('')||'<div class="empty">Pichhle mahine koi expense nahi.</div>';
+}
+function renderReport(){const totals={};Object.keys(CATEGORIES).forEach(k=>totals[k]=0);expenses.forEach(e=>totals[e.category]=(totals[e.category]||0)+Number(e.amount));const grand=Object.values(totals).reduce((a,b)=>a+b,0);$('report').innerHTML=Object.entries(totals).sort((a,b)=>b[1]-a[1]).filter(([,v])=>v>0).map(([k,v])=>`<div class="report-row"><div class="rhead"><span><b>${k}</b> ${CATEGORIES[k]}</span><b>₹${money(v)}</b></div><div class="bar"><i style="width:${grand?Math.round(v/grand*100):0}%"></i></div></div>`).join('')||'<div class="empty">Abhi koi expense nahi.</div>'}
+function renderFilters(){const months=[...new Set(expenses.map(e=>e.expense_date?.slice(0,7)).filter(Boolean))].sort().reverse();const current=$('filterMonth').value;$('filterMonth').innerHTML='<option value="ALL">All dates</option>'+months.map(m=>`<option value="${m}">${new Date(m+'-01T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'})}</option>`).join('');if(months.includes(current))$('filterMonth').value=current}
+function filtered(){const q=$('search').value.trim().toLowerCase(),cat=$('filterCat').value,mo=$('filterMonth').value;return expenses.filter(e=>(cat==='ALL'||e.category===cat)&&(mo==='ALL'||e.expense_date?.startsWith(mo))&&(!q||`${CATEGORIES[e.category]} ${e.note}`.toLowerCase().includes(q)))}
+function renderEntries(){const arr=filtered();if(!arr.length){$('entries').innerHTML='<div class="empty">Koi matching entry nahi mili.</div>';return}$('entries').innerHTML=arr.map(e=>`<div class="entry"><div class="entry-left">${e.photo_url?`<img class="thumb" src="${e.photo_url}" onclick="openPhoto('${e.photo_url}')">`:''}<span class="badge">${e.category}</span><div class="entry-text"><b>${escapeHtml(e.note||CATEGORIES[e.category])}</b><small>${CATEGORIES[e.category]} · ${prettyDate(e.expense_date)}${e.has_bill?' · 🧾 Bill':''}</small></div></div><div class="entry-right"><span class="amount">₹${money(e.amount)}</span><button class="btn danger mini" onclick="deleteExpense('${e.id}')">✕ <span class="delete-label">Delete</span></button></div></div>`).join('')}
+function renderTransactions(){if(!transactions.length){$('transactions').innerHTML='<div class="empty">No transaction history.</div>';return}$('transactions').innerHTML=transactions.slice(0,80).map(x=>`<div class="entry"><div class="entry-text"><b>${txLabel(x.type)}</b><small>${prettyDate(x.transaction_date)} · ${escapeHtml(x.note||'')}</small></div><div class="entry-right"><span class="amount">₹${money(x.amount)}</span><small>${money(x.balance_before)} → ${money(x.balance_after)}</small></div></div>`).join('')}
+function txLabel(t){return ({fund_add:'Fund mein paisa diya',fund_remove:'Fund se kam',reserve_add:'Reserve mein jama',reserve_remove:'Reserve se kam',expense:'Kharcha',expense_deleted:'Kharcha delete/refund'})[t]||t}
+function prettyDate(d){return d?new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):''}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+async function walletChange(bucket,sign){const inp=$(bucket==='fund'?'fundInput':'reserveInput'),v=Number(inp.value);if(!v||v<=0)return alert('Amount daalo');const date=today();const {error}=await sb.rpc('change_wallet',{p_household:household.id,p_bucket:bucket,p_delta:sign*v,p_date:date,p_note:''});if(error)return alert(error.message);inp.value='';await loadData()}
+async function addExpense(){const amount=Number($('expenseAmount').value);if(!amount||amount<=0)return message('expenseMsg','Amount sahi daalo');let photoUrl=null;const file=$('expensePhoto').files[0];if(file){if(file.size>5*1024*1024)return message('expenseMsg','Photo 5 MB se chhoti rakho');const path=`${household.id}/${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;const up=await sb.storage.from('bill-photos').upload(path,file,{upsert:false});if(up.error)return message('expenseMsg','Photo upload: '+up.error.message);photoUrl=sb.storage.from('bill-photos').getPublicUrl(path).data.publicUrl}const {error}=await sb.rpc('add_expense',{p_household:household.id,p_category:selectedCat,p_amount:amount,p_note:$('expenseNote').value.trim(),p_date:$('expenseDate').value||today(),p_has_bill:$('billSelect').value==='true',p_photo_url:photoUrl});if(error)return message('expenseMsg',error.message);clearExpense();message('expenseMsg','Kharcha cloud mein save ho gaya.',true);await loadData()}
+function deleteExpense(id){return guard(deleteExpense_)(id)}async function deleteExpense_(id){if(!confirm('Entry delete karke fund mein amount wapas karein?'))return;const {error}=await sb.rpc('delete_expense',{p_id:id});if(error)return alert(error.message);await loadData()}
+function clearExpense(){$('expenseAmount').value='';$('expenseNote').value='';$('expensePhoto').value='';$('billSelect').value='false';$('expenseDate').value=today()}
+function openPhoto(src){$('lightImg').src=src;$('lightbox').classList.remove('hidden')}function closeLightbox(){$('lightbox').classList.add('hidden');$('lightImg').src=''}
+$('setupBtn').onclick=()=>openSetup();$('setupAppBtn').onclick=()=>openSetup();
+function openSetup(){var c=cfg();$('cfgUrl').value=c.url||cleanUrl(lsGet('gk2_url'));$('cfgKey').value=c.key||cleanKey(lsGet('gk2_key'));message('setupMsg','');$('setupModal').classList.remove('hidden')}
+$('closeSetup').onclick=()=>$('setupModal').classList.add('hidden');
+$('clearSetup').onclick=()=>{lsDel('gk2_url');lsDel('gk2_key');resetClient();$('cfgUrl').value='';$('cfgKey').value='';resetSession();message('setupMsg','Cleared. Cloud Setup dobara bharo.',true)};
+$('saveSetup').onclick=guard(async()=>{
+  var u=cleanUrl($('cfgUrl').value),k=cleanKey($('cfgKey').value);
+  var pr=urlProblem(u)||keyProblem(k); if(pr)return message('setupMsg',pr);
+  var btn=$('saveSetup');btn.disabled=true;message('setupMsg','Connection check ho raha hai...',true);
+  try{
+    var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},10000),r;
+    try{r=await fetch(u+'/auth/v1/settings',{headers:{apikey:k},signal:ctl.signal})}finally{clearTimeout(t)}
+    if(!r.ok){var d='';try{var j=await r.json();d=j.msg||j.message||j.error_description||''}catch(_){}throw new Error('Supabase ne reject kiya (HTTP '+r.status+')'+(d?': '+d:'')+' - URL/key check karo.')}
+    if(!lsSet('gk2_url',u)||!lsSet('gk2_key',k))throw new Error('Browser storage block hai (private mode?) - settings save nahi ho sakin.');
+    resetClient(); /* no page reload: just drop the old client, new one is created lazily */
+    message('setupMsg','Connected ✓ Ab Login ya Naya Account use karo.',true);
+    message('authMsg','Supabase connected ✓',true);
+    setTimeout(function(){$('setupModal').classList.add('hidden')},900);
+    getSb().catch(function(e){message('authMsg','Supabase connection failed: '+e.message)});
+  }catch(e){message('setupMsg','Supabase connection failed: '+(e.name==='AbortError'?'timeout (10s)':e.message))}
+  finally{btn.disabled=false}
+});
+$('loginTab').onclick=showLoginTab;$('signupTab').onclick=showSignupTab;
+async function needClient(){try{return await getSb()}catch(e){if(e.needSetup){message('authMsg',e.message);openSetup()}else message('authMsg','Supabase connection failed: '+e.message);return null}}
+$('loginBtn').onclick=guard(async()=>{
+  var client=await needClient();if(!client)return;
+  var email=$('loginEmail').value.trim(),password=$('loginPassword').value;
+  if(!email||!password)return message('authMsg','Email aur password daalo');
+  var btn=$('loginBtn');btn.disabled=true;message('authMsg','Login ho raha hai...',true);
+  try{var r=await client.auth.signInWithPassword({email:email,password:password});if(r.error)message('authMsg',r.error.message);else message('authMsg','',true)}
+  catch(e){message('authMsg','Supabase connection failed: '+e.message)}finally{btn.disabled=false}
+});
+$('signupBtn').onclick=guard(async()=>{
+  var name=$('signupName').value.trim(),email=$('signupEmail').value.trim(),password=$('signupPassword').value;
+  if(!name||!email||password.length<6)return message('authMsg','Name, email aur 6+ digit password daalo');
+  var client=await needClient();if(!client)return;
+  var btn=$('signupBtn');btn.disabled=true;message('authMsg','Account ban raha hai...',true);
+  try{var r=await client.auth.signUp({email:email,password:password,options:{data:{name:name}}});
+    if(r.error)message('authMsg',r.error.message);else message('authMsg',r.data&&r.data.session?'Account ready.':'Account created. Agar email confirmation on hai to email verify karo.',true)}
+  catch(e){message('authMsg','Supabase connection failed: '+e.message)}finally{btn.disabled=false}
+});
+$('logoutBtn').onclick=guard(()=>sb?sb.auth.signOut():resetSession());
+$('refreshBtn').onclick=guard(()=>household?loadData():loadMembership());$('search').oninput=renderEntries;$('filterCat').onchange=renderEntries;$('filterMonth').onchange=renderEntries;$('fundAdd').onclick=guard(()=>walletChange('fund',1));$('fundRemove').onclick=guard(()=>walletChange('fund',-1));$('reserveAdd').onclick=guard(()=>walletChange('reserve',1));$('reserveRemove').onclick=guard(()=>walletChange('reserve',-1));$('addExpense').onclick=()=>addExpense().catch(e=>message('expenseMsg',e.message));$('clearExpense').onclick=clearExpense;
+$('createHouse').onclick=guard(async()=>{const n=$('houseName').value.trim()||'My Family';const {error}=await sb.rpc('create_household',{p_name:n});if(error)return message('houseMsg',error.message);await loadMembership()});$('joinHouse').onclick=guard(async()=>{const c=$('joinCode').value.trim().toUpperCase();const {error}=await sb.rpc('join_household',{p_code:c});if(error)return message('houseMsg',error.message);await loadMembership()});
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=guard(async ev=>{
+  const f=ev.target.files[0];ev.target.value='';if(!f)return;
+  if(!household||!sb)return message('importMsg','Pehle household banao/join karo');
+  let d;try{d=JSON.parse(await f.text())}catch(e){return message('importMsg','File padhi nahi ja saki - sahi .json backup chuno')}
+  if(d.app!=='ghar-kharcha-register')return message('importMsg','Ye purani Ghar Kharcha Register ki backup file nahi lagti');
+  const num=v=>Number.isFinite(Number(v))?Number(v):0,dt=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'')?s:today(),ts=v=>{const x=new Date(v);return isNaN(x)?new Date().toISOString():x.toISOString()};
+  const ex=(Array.isArray(d.expenses)?d.expenses:[]).filter(e=>num(e.amt)>0),lg=Array.isArray(d.ledger)?d.ledger:[],fund=Math.max(num(d.fund),0),res=Math.max(num(d.reserve),0);
+  if(!confirm('Import karein?\n\n'+ex.length+' kharche, '+lg.length+' history entries\nFund ₹'+money(fund)+' | Reserve ₹'+money(res)+'\n\nYe sirf ek baar, khali household mein ho sakta hai.'))return;
+  const btn=$('importBtn');btn.disabled=true;
+  try{
+    const rows=[];let i=0;
+    for(const e of ex){i++;let url=null;
+      if(typeof e.photo==='string'&&e.photo.indexOf('data:')===0){message('importMsg','Photo upload '+i+'/'+ex.length+'...',true);
+        try{const blob=await(await fetch(e.photo)).blob(),path=household.id+'/'+user.id+'/old-'+Date.now()+'-'+i+'.jpg',up=await sb.storage.from('bill-photos').upload(path,blob,{contentType:blob.type||'image/jpeg'});if(!up.error)url=sb.storage.from('bill-photos').getPublicUrl(path).data.publicUrl}catch(_){}}
+      rows.push({cat:e.cat,amt:num(e.amt),note:String(e.note||''),date:dt(e.date),has_bill:!!e.hasBill,photo_url:url,ts:ts(e.id)})}
+    const led=lg.map(l=>({type:String(l.type||''),amount:Math.abs(num(l.amount)),note:String(l.note||''),before:num(l.balanceBefore),after:num(l.balanceAfter),date:dt(l.date),ts:ts(l.time)}));
+    message('importMsg','Cloud mein save ho raha hai...',true);
+    const {data,error}=await sb.rpc('import_legacy',{p_household:household.id,p_fund:fund,p_reserve:res,p_expenses:rows,p_ledger:led});
+    if(error)return message('importMsg',error.message);
+    message('importMsg','Import ho gaya ✓ '+data.expenses+' kharche, '+data.transactions+' history entries.',true);await loadData();
+  }finally{btn.disabled=false}
+});
+$('copyCode').onclick=guard(async()=>{if(!household)return;navigator.clipboard?.writeText(household.join_code);alert('Join code copied: '+household.join_code)});
+$('exportJson').onclick=()=>{const data={app:'Ghar Kharcha Online v2',exportedAt:new Date().toISOString(),household,wallet,expenses,transactions};downloadBlob(JSON.stringify(data,null,2),'ghar-kharcha-backup-'+today()+'.json','application/json')};
+$('exportExcel').onclick=async()=>{try{await loadXLSX()}catch(e){return alert(e.message)}const rows=expenses.map(e=>({Date:e.expense_date,Category:CATEGORIES[e.category]||e.category,Code:e.category,Note:e.note||'',Amount:Number(e.amount),Bill:e.has_bill?'Yes':'No',Created:e.created_at}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Expenses');XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(transactions.map(t=>({Date:t.transaction_date,Type:txLabel(t.type),Amount:Number(t.amount),Before:Number(t.balance_before),After:Number(t.balance_after),Note:t.note||'',Created:t.created_at}))),'Transactions');XLSX.writeFile(wb,'ghar-kharcha-'+today()+'.xlsx')};
+function downloadBlob(text,name,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+if('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{}); init();
+</script>
+</body></html>
