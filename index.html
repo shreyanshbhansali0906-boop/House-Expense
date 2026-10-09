@@ -62,6 +62,8 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th,table.t td
 
 input.date-big{font-size:22px!important;font-weight:700;text-align:center;padding:12px!important;margin-top:8px;width:100%;border:2px solid var(--ink,#333)!important;border-radius:10px}
 
+
+.cats.need{outline:3px solid var(--rust);outline-offset:4px;border-radius:10px}
 </style>
 </head>
 <body>
@@ -159,7 +161,10 @@ var T = {
   tellBhaiya: { en: '📤 Tell Shreyansh', hg: '📤 Bhaiya ko batao', hi: '📤 भैया को बताओ' },
   eyebrow: { en: 'Household accounts', hg: 'Ghar ka hisaab', hi: 'घर का हिसाब' },
   loanRepay: { en: 'Loan repayment', hg: 'Loan wapsi', hi: 'लोन वापसी' }, fundFix: { en: 'Fund correction', hg: 'Galti sudhaar', hi: 'फंड सुधार' },
-  old7: { en: 'some are 7+ days old', hg: '7+ din purani bhi hain', hi: 'कुछ 7+ दिन पुराने हैं' },
+  old15: { en: 'some are 15+ days old', hg: '15+ din purani bhi hain', hi: 'कुछ 15+ दिन पुराने हैं' },
+  pickCat: { en: 'Pick a category (tap an icon)', hg: 'Category chuno (icon dabao)', hi: 'श्रेणी चुनें (आइकन दबाएँ)' },
+  diffAmt: { en: 'Difference: ₹{a}', hg: 'Farak: ₹{a}', hi: 'फ़र्क: ₹{a}' },
+  countFirst: { en: 'Count the cash before adding the top-up, so each 15-day round starts clean.', hg: 'Top-up se pehle cash gin lo, taaki har 15 din ka hisaab saaf shuru ho.', hi: 'टॉप-अप से पहले कैश गिन लें, ताकि हर 15 दिन का हिसाब साफ़ शुरू हो।' },
   lastDiff: { en: 'Last cash count differed by ₹{a}', hg: 'Last ginti mein farak: ₹{a}', hi: 'पिछली गिनती में फ़र्क: ₹{a}' },
   waLow: { en: '🏠 Ghar Kharcha: fund ₹{f} is below the limit ₹{l}. Owed to people ₹{d}. Please send money.', hg: '🏠 Ghar Kharcha: fund ₹{f} (limit ₹{l} se kam). Dena baaki ₹{d}. Kripya paisa bhejein.', hi: '🏠 घर खर्चा: फंड ₹{f} (सीमा ₹{l} से कम)। देना बाकी ₹{d}। कृपया पैसे भेजें।' },
   rpTitle: { en: 'Supervisor report', hg: 'Supervisor report', hi: 'सुपरवाइज़र रिपोर्ट' }, rpSpend: { en: 'Spent', hg: 'Kharcha', hi: 'खर्चा' },
@@ -421,6 +426,8 @@ var HI_RX = [
   [/^🟢 Open · close manually$/, '🟢 खुला · हाथ से बंद करें'], [/^🟢 Open · auto-closes /, '🟢 खुला · अपने-आप बंद होगा '], [/^🔒 Closed /, '🔒 बंद '], [/ \(auto\)/, ' (अपने-आप)'], [/ · 📧 sent$/, ' · 📧 भेजा'],
   [/ · cloud synced$/, ' · क्लाउड से जुड़ा'], [/(^|\s)· Fund ₹/, '$1· फंड ₹'],
   [new RegExp(' · (' + Object.keys(CATS).map(function (k) { return CATS[k].en.replace(/[()&]/g, '\\$&'); }).join('|') + ')( —| |$)'), function (m, c, e) { for (var k in CATS) if (CATS[k].en === c) return ' · ' + CATS[k].hi + e; return m; }],
+  [/^🔎 Some of Mamta's entries are unchecked for 15\+ days \((\d+) total\)\.$/, '🔎 ममता की कुछ एंट्री 15+ दिन से जाँची नहीं गईं (कुल $1)।'],
+  [/^💰 Last cash count \((.*)\) differs by ₹(.*)\.$/, '💰 पिछली कैश गिनती ($1) में ₹$2 का फ़र्क है।'],
   [/^Loan rate: /, 'लोन दर: '], [/(^|, |: )from (\d{4}-\d\d-\d\d): /g, '$1$2 से: '], [/ join request\(s\) waiting — see Team below\.$/, ' जुड़ने के अनुरोध बाकी — नीचे टीम देखें।'], [/ self-settlement\(s\) waiting for Shrey\.$/, ' खुद के भुगतान श्रेय की मंज़ूरी के लिए बाकी।'],
   [/^(✅ |⚠️ )?Last backup (\d+) days ago$/, '$1आख़िरी बैकअप $2 दिन पहले'], [/^ADJUST WHAT THE HOUSE OWES SHREYANSH \(₹(.*)\) — added to loan, no cash moves$/, 'घर पर श्रेयांश का बकाया एडजस्ट करें (₹$1) — लोन में जुड़ेगा, कैश नहीं हिलेगा'],
   [/^(.*) is closed\. The original stays as it is; a correction \(reverse \+ new entry\) is posted today, with your reason\.$/, '$1 बंद है। असली एंट्री वैसी ही रहेगी; आज आपके कारण के साथ सुधार (उल्टी + नई एंट्री) डाली जाएगी।'],
@@ -650,7 +657,7 @@ function viewMamta() {
 }
 function todoCard() {
   var u = unverified(), a = pendingApprovals(), lc = lastCheck(), age = lc ? daysBetween(lc.check_date, today()) : null, items = [];
-  if (u.length) items.push('<div class="it"><div class="ic">🔎</div><div class="tx"><b>' + t('toCheck', { n: u.length }) + '</b>' + (u.some(function (e) { return daysBetween(e.expense_date, today()) > 7; }) ? '<small class="err">' + t('old7') + '</small>' : '') + '</div><button class="btn mini" data-a="verifyList">' + t('verify') + '</button></div>');
+  if (u.length) items.push('<div class="it"><div class="ic">🔎</div><div class="tx"><b>' + t('toCheck', { n: u.length }) + '</b>' + (u.some(function (e) { return daysBetween(e.expense_date, today()) > 15; }) ? '<small class="err">' + t('old15') + '</small>' : '') + '</div><button class="btn mini" data-a="verifyList">' + t('verify') + '</button></div>');
   if (a.length) items.push('<div class="it"><div class="ic">🧾</div><div class="tx"><b>' + t('toApprove', { n: a.length }) + '</b></div><button class="btn mini" data-a="approveList">' + t('approve') + '</button></div>');
   if (age === null || age >= 15) items.push('<div class="it"><div class="ic">💰</div><div class="tx"><b>' + t('cashCheckDue') + '</b>' + (lc ? '<small>' + t('cashCheckOk', { d: age }) + '</small>' : '') + '</div><button class="btn mini" data-a="cashCheck">' + t('cashCount') + '</button></div>');
   if (lc && lc.diff != 0) items.push('<div class="it"><div class="ic">⚠️</div><div class="tx"><b>' + t('lastDiff', { a: money(lc.diff) }) + '</b><small>' + prettyDate(lc.check_date) + '</small></div></div>');
@@ -668,7 +675,7 @@ function viewOwner() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today()), u = unverified(), a = pendingApprovals(), pend = ST.team.filter(function (m) { return m.role === 'pending'; });
   var al = lowCashBanner();
   if (pend.length) al += '<div class="banner blue">🙋 ' + pend.length + ' join request(s) waiting — see Team below.</div>';
-  if (u.some(function (e) { return daysBetween(e.expense_date, today()) > 7; })) al += '<div class="banner org">🔎 Some of Mamta\'s entries are unchecked for 7+ days (' + u.length + ' total).</div>';
+  if (u.some(function (e) { return daysBetween(e.expense_date, today()) > 15; })) al += '<div class="banner org">🔎 Some of Mamta\'s entries are unchecked for 15+ days (' + u.length + ' total).</div>';
   if (a.length) al += '<div class="banner org">🧾 ' + a.length + ' self-settlement(s) waiting for Shrey.</div>';
   var lc = lastCheck(); if (lc && Number(lc.diff) !== 0) al += '<div class="banner red">💰 Last cash count (' + prettyDate(lc.check_date) + ') differs by ₹' + money(lc.diff) + '.</div>';
   var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member">Mamta</option><option value="admin">Shrey</option><option value="guest">Guest</option></select>';
@@ -817,7 +824,7 @@ function splitArgs(sh) { return { p_cost_centre: sh.map(function (x) { return x[
 
 /* ---------- expense form (add / edit) ---------- */
 function expenseForm(e) {
-  var edit = !!e, cat = edit ? e.category : 'GR', payer = edit ? e.paid_by : 'fund', locked = edit && !!e.settlement_id;
+  var edit = !!e, cat = edit ? e.category : null, payer = edit ? e.paid_by : 'fund', locked = edit && !!e.settlement_id;
   var payOpts = [['fund', t('houseFund')]].concat(payers().map(function (p) { return [p, pName(p) + (p === 'Mamta' && R() === 'member' ? ' (' + (LANG === 'hi' ? 'मेरी जेब' : 'my pocket') + ')' : ' · ' + t('ownPocket'))]; }));
   var m = openModal(sheetHead(edit ? t('edit') : t('addExpense').replace('+ ', '')) +
     '<div class="field"><label>' + t('amount') + '</label><input id="fAmt" class="amount-big" type="number" inputmode="decimal" min="0" step="0.01" value="' + (edit ? Number(e.amount) : '') + '"' + (locked ? ' disabled' : '') + '></div>' +
@@ -831,7 +838,7 @@ function expenseForm(e) {
   var selCat = cat, selPay = payer;
   var picker = ccPicker($('fCC'), edit ? shares(e) : [['Household', 0]], function () { return Number($('fAmt').value) || 0; });
   $('fAmt').addEventListener('input', function () { picker.refresh(); });
-  m.querySelectorAll('[data-cat]').forEach(function (b) { b.onclick = function () { selCat = b.dataset.cat; m.querySelectorAll('[data-cat]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+  m.querySelectorAll('[data-cat]').forEach(function (b) { b.onclick = function () { selCat = b.dataset.cat; $('fCats').classList.remove('need'); if ($('fMsg').textContent === t('pickCat')) $('fMsg').textContent = ''; m.querySelectorAll('[data-cat]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
   m.querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { selPay = b.dataset.p; m.querySelectorAll('[data-p]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
   function syncDate() { $('fDateShow').textContent = longDate($('fDate').value); }
   $('fDate').onchange = syncDate; $('fDate').oninput = syncDate;
@@ -839,6 +846,7 @@ function expenseForm(e) {
   $('fSave').onclick = guard(async function () {
     var amt = Number($('fAmt').value), date = $('fDate').value || today(), btn = $('fSave');
     if (!(amt > 0)) { $('fMsg').textContent = t('amountBad'); return; }
+    if (!selCat) { $('fMsg').textContent = t('pickCat'); var fc = $('fCats'); if (fc) { fc.classList.add('need'); fc.scrollIntoView({ block: 'center', behavior: 'smooth' }); } return; }
     var cp = picker.get(); if (!cp.ok) { $('fMsg').textContent = cp.err; return; }
     if (edit) {
       var reason = $('fReason').value.trim(); if (!reason) { $('fMsg').textContent = t('reason'); return; }
@@ -929,19 +937,22 @@ function approveModal() {
   var a = pendingApprovals();
   openModal(sheetHead(t('toApprove', { n: a.length })) + '<div class="list">' + a.map(function (s) { var items = ST.expenses.filter(function (e) { return e.settlement_id === s.id; }); return '<div class="it" style="cursor:default"><div class="tx"><b>' + esc(pName(s.payee)) + ' · ₹' + money(s.amount) + '</b><small>' + prettyDate(s.settle_date) + (s.note ? ' · ' + esc(s.note) : '') + (items.length ? ' · ' + items.map(function (e) { return esc(noteTx(e.note) || catName(e.category)) + ' ₹' + money(e.amount); }).join(', ') : '') + '</small></div><button class="btn green mini" data-a="approveOne" data-id="' + s.id + '">' + t('approve') + '</button></div>'; }).join('') + '</div>');
 }
-function cashCheckModal() {
+function cashCheckModal(from) { var after = from === 'topup' ? topupModal : null;
   openModal(sheetHead('💰 ' + t('cashCount')) + '<p>App: <b>₹' + money(fund()) + '</b></p><div class="field"><label>' + t('counted') + '</label><input id="ccCount" class="amount-big" type="number" inputmode="decimal"></div><div class="field"><label>' + t('note') + '</label><input id="ccNote"></div><div id="ccDiff" style="font-size:17px;margin-bottom:8px"></div><button class="btn huge" id="ccGo">' + t('save') + '</button>');
-  $('ccCount').oninput = function () { var d = Number($('ccCount').value) - fund(); $('ccDiff').innerHTML = $('ccCount').value === '' ? '' : (Math.abs(d) < 0.01 ? '<span class="okc">✓ Match</span>' : '<span class="err">Farak: ₹' + money(d) + '</span>'); };
-  $('ccGo').onclick = guard(async function () { if ($('ccCount').value === '') return; await rpc('cash_check', { p_household: ST.hh.id, p_counted: Number($('ccCount').value), p_note: $('ccNote').value.trim() }); closeModal(); toast(t('saved')); await refresh(); });
+  $('ccCount').oninput = function () { var d = Number($('ccCount').value) - fund(); $('ccDiff').innerHTML = $('ccCount').value === '' ? '' : (Math.abs(d) < 0.01 ? '<span class="okc">✓ Match</span>' : '<span class="err">' + t('diffAmt', { a: money(d) }) + '</span>'); };
+  $('ccGo').onclick = guard(async function () { if ($('ccCount').value === '') return; await rpc('cash_check', { p_household: ST.hh.id, p_counted: Number($('ccCount').value), p_note: $('ccNote').value.trim() }); closeModal(); toast(t('saved')); await refresh(); if (after) after(); });
 }
 function topupModal() {
   var owedS = Math.max(0, -((bals()['Shreyansh'] || { bal: 0 }).bal)), n = nextCashInfo(ST.expenses, ST.txs, fund(), dues());
-  openModal(sheetHead(t('addTopup')) + '<p class="small muted">Fund ₹' + money(fund()) + (ST.hh.low_fund_threshold != null ? ' · limit ₹' + money(ST.hh.low_fund_threshold) : '') + ' · dues ₹' + money(dues()) + '</p>' +
+  var lcT = lastCheck(), ageT = lcT ? daysBetween(lcT.check_date, today()) : null;
+  var countFirst = (ageT === null || ageT > 1) ? '<div class="banner org" style="margin-bottom:10px">💰 ' + t('countFirst') + (lcT ? ' <small>(' + t('cashCheckOk', { d: ageT }) + ')</small>' : '') + '<div style="margin-top:6px"><button class="btn mini" id="tuCount">💰 ' + t('cashCount') + '</button></div></div>' : '';
+  openModal(sheetHead(t('addTopup')) + countFirst + '<p class="small muted">Fund ₹' + money(fund()) + (ST.hh.low_fund_threshold != null ? ' · limit ₹' + money(ST.hh.low_fund_threshold) : '') + ' · dues ₹' + money(dues()) + '</p>' +
     '<div class="field"><label>CASH GIVEN TO MUMMY ₹</label><input id="tuAmt" class="amount-big" type="number" inputmode="decimal"></div>' +
     '<div class="field"><label>SOURCE</label><select id="tuSrc"><option value="shreyansh">Shreyansh (loan, ' + rateOn(ST.hh.loan_rates, today()) + '%/month)</option><option value="business">Business income (not a loan)</option></select></div>' +
     '<div class="field"><label>' + t('date') + '</label><input id="tuDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="tuNote"></div>' +
     (owedS > 0 ? '<div class="field"><label>ADJUST WHAT THE HOUSE OWES SHREYANSH (₹' + money(owedS) + ') — added to loan, no cash moves</label><input id="tuAdj" type="number" inputmode="decimal" value="' + owedS + '"></div>' : '') +
     '<button class="btn huge green" id="tuGo">' + t('save') + '</button>');
+  if ($('tuCount')) $('tuCount').onclick = function () { cashCheckModal('topup'); };
   $('tuGo').onclick = guard(async function () { var adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0, a = Number($('tuAmt').value) || 0; if (!(a > 0) && !(adj > 0)) return toast(t('amountBad'), true); busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_amount: adj }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
 }
 function repayModal() {
