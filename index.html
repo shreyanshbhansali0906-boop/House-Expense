@@ -64,7 +64,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th,table.t td
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v14 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -73,6 +73,7 @@ var CATS = {
   VG: { en: 'Vegetables', hi: 'सब्ज़ी', hg: 'Sabzi', ic: '🥬' },
   FR: { en: 'Fruits', hi: 'फल', hg: 'Phal', ic: '🍎' },
   MD: { en: 'Milk & Dairy', hi: 'दूध', hg: 'Doodh', ic: '🥛' },
+  OF: { en: 'Outside food', hi: 'बाहर का खाना', hg: 'Bahar ka khana', ic: '🍽️' },
   HK: { en: 'Housekeeping', hi: 'सफ़ाई', hg: 'Safai', ic: '🧹' },
   MA: { en: 'Maid', hi: 'कामवाली', hg: 'Kaamwali', ic: '👩' },
   LG: { en: 'LPG', hi: 'गैस', hg: 'Gas', ic: '🔥' },
@@ -143,6 +144,17 @@ var T = {
   photoTip: { en: 'Tap photo to zoom', hg: 'Photo dabao — bada hoga', hi: 'फ़ोटो दबाएँ — बड़ी होगी' },
   settleSelf: { en: 'Pay myself back', hg: 'Khud ko wapas', hi: 'खुद को वापस' },
   entries: { en: 'entries', hg: 'entry', hi: 'खर्चे' },
+  advWith: { en: 'advance with {p}', hg: '{p} ke paas advance', hi: '{p} के पास एडवांस' },
+  oweTo: { en: 'House owes {p}', hg: '{p} ko dena hai', hi: '{p} को देना है' },
+  settled0: { en: 'All square', hg: 'Hisaab barabar', hi: 'हिसाब बराबर' },
+  give: { en: 'Give money', hg: 'Paise diye', hi: 'पैसे दिए' }, gotBack: { en: 'Got back', hg: 'Wapas mile', hi: 'वापस मिले' },
+  accounts: { en: 'People accounts (dues & advances)', hg: 'Kiska kitna (dena / advance)', hi: 'किसका कितना (देना / एडवांस)' },
+  afterPay: { en: 'After this: {x}', hg: 'Iske baad: {x}', hi: 'इसके बाद: {x}' },
+  howMuchGive: { en: 'How much given ₹', hg: 'Kitne diye ₹', hi: 'कितने दिए ₹' }, howMuchBack: { en: 'How much back ₹', hg: 'Kitne wapas mile ₹', hi: 'कितने वापस मिले ₹' },
+  cashWithPeople: { en: 'Advance with people', hg: 'Logon ke paas advance', hi: 'लोगों के पास एडवांस' },
+  lowFund: { en: 'Fund ₹{f} is below the limit ₹{l}', hg: 'Fund ₹{f} — limit ₹{l} se kam', hi: 'फंड ₹{f} — सीमा ₹{l} से कम' },
+  tellBhaiya: { en: '📤 Tell Shreyansh', hg: '📤 Bhaiya ko batao', hi: '📤 भैया को बताओ' },
+  textSize: { en: 'Text', hg: 'Akshar', hi: 'अक्षर' },
   correct: { en: 'Correction', hg: 'Sudhaar', hi: 'सुधार' }
 };
 function t(k, v) { var o = T[k]; var s = o ? (o[LANG] || o.hg || o.en) : k; if (v) Object.keys(v).forEach(function (x) { s = s.split('{' + x + '}').join(v[x]); }); return s; }
@@ -173,6 +185,15 @@ function live(e) { return !e.removed_at; }
 function shares(e) { if (Array.isArray(e.cost_split) && e.cost_split.length > 1) return e.cost_split.map(function (x) { return [x.cc, Number(x.amt)]; }); return [[e.cost_centre || 'Household', Number(e.amount)]]; }
 function ccLabel(e) { var s = shares(e); return s.length > 1 ? s.map(function (x) { return pName(x[0]) + ' ₹' + money(Math.abs(x[1])); }).join(' + ') : pName(s[0][0]); }
 function isPending(e) { return live(e) && e.paid_by && e.paid_by !== 'fund' && !e.settlement_id && (e.entry_kind || 'normal') === 'normal'; }
+function balances(exps, setts, people) {
+  var o = {}; (people || []).forEach(function (p) { o[p] = { given: 0, returned: 0, spent: 0, bal: 0 }; });
+  (setts || []).forEach(function (s) { var x = o[s.payee] = o[s.payee] || { given: 0, returned: 0, spent: 0, bal: 0 }; if (s.method === 'return') x.returned += Number(s.amount); else x.given += Number(s.amount); });
+  (exps || []).forEach(function (e) { if (!live(e) || !e.paid_by || e.paid_by === 'fund') return; var x = o[e.paid_by] = o[e.paid_by] || { given: 0, returned: 0, spent: 0, bal: 0 }; x.spent += Number(e.amount); });
+  Object.keys(o).forEach(function (k) { var x = o[k]; x.bal = Math.round((x.given - x.returned - x.spent) * 100) / 100; });
+  return o;
+}
+function owedTotal(b) { return Object.keys(b).reduce(function (a, k) { return a + Math.max(0, -b[k].bal); }, 0); }
+function advTotal(b) { return Object.keys(b).reduce(function (a, k) { return a + Math.max(0, b[k].bal); }, 0); }
 function duesBy(exps) { var o = {}; exps.filter(isPending).forEach(function (e) { (o[e.paid_by] = o[e.paid_by] || { total: 0, items: [] }); o[e.paid_by].total += Number(e.amount); o[e.paid_by].items.push(e); }); return o; }
 function duesTotal(exps) { return exps.filter(isPending).reduce(function (a, e) { return a + Number(e.amount); }, 0); }
 function sumAmt(arr) { return arr.reduce(function (a, e) { return a + Number(e.amount); }, 0); }
@@ -183,7 +204,6 @@ function isClosed(closes, d) { var m = ym(d); return closes.some(function (c) { 
 function entryStatus(e, closes) {
   if (!live(e)) return 'rem';
   if (isClosed(closes, e.expense_date)) return 'lock';
-  if (isPending(e)) return 'due';
   if (e.verified_at) return 'ver';
   return 'open';
 }
@@ -193,15 +213,16 @@ function canEdit(e, role, uid, closes) {
   if (role === 'member') return e.user_id === uid && !e.verified_at && (Date.now() - new Date(e.created_at).getTime()) < 3 * 864e5;
   return false;
 }
-function canRemove(e, role, closes) { return role === 'owner' && live(e) && (e.entry_kind || 'normal') === 'normal' && !e.settlement_id && !isClosed(closes, e.expense_date); }
+function canRemove(e, role, closes) { return role === 'owner' && live(e) && (e.entry_kind || 'normal') === 'normal' && !isClosed(closes, e.expense_date); }
 function canCorrect(e, role, closes) {
   return (role === 'owner' || role === 'admin') && live(e) && (e.entry_kind || 'normal') === 'normal' && !e.corrected_at &&
-    isClosed(closes, e.expense_date) && !(e.paid_by !== 'fund' && !e.settlement_id);
+    isClosed(closes, e.expense_date);
 }
 function isDuplicate(exps, amount, cat, date) { return exps.some(function (e) { return live(e) && Number(e.amount) === Number(amount) && e.category === cat && e.expense_date === date; }); }
 
 /* ---------- quick entry (Hindi + Hinglish + English, voice friendly) ---------- */
 var QK = [
+  ['OF', /outside|hotel|restaurant|resturant|dhaba|zomato|swiggy|pizza|burger|momos|chaat|samosa|nashta|party|bahar|बाहर|होटल|ढाबा|पिज़्ज़ा|पिज्जा|चाट|समोसा|नाश्ता|पार्टी/i],
   ['VG', /sabzi|sabji|sabjee|veg|tamatar|tomato|pyaz|onion|aloo|सब्ज़ी|सब्जी|टमाटर|प्याज|आलू|भाजी/i],
   ['FR', /fruit|phal|kela|seb|angur|फल|केला|सेब|अंगूर|आम/i],
   ['MD', /doodh|dudh|milk|dahi|paneer|dairy|ghee|दूध|दही|पनीर|घी|मक्खन/i],
@@ -214,7 +235,7 @@ var QK = [
   ['GR', /kirana|grocer|ration|atta|aata|dal|chawal|rice|tel|oil|namak|cheeni|sugar|किराना|राशन|आटा|दाल|चावल|तेल|नमक|चीनी/i]
 ];
 var QP = [['Mamta', /mamta|mummy|mumma|maa\b|ममता|मम्मी|माँ|मां/i], ['Papa', /papa|पापा/i], ['Shreyansh', /shreyansh|श्रेयांश/i],
-  ['Shreya', /shreya\b|श्रेया/i], ['Shrey', /shrey\b|श्रेय\b/i], ['Simba', /simba|सिंबा/i], ['Household', /\bghar\b|household|घर/i]];
+  ['Shreya', /shreya\b|श्रेया(?![\u0900-\u097F])/i], ['Shrey', /shrey\b|श्रेय(?![\u0900-\u097F])/i], ['Simba', /simba|सिंबा/i], ['Household', /\bghar\b|household|घर/i]];
 function parseQuick(text) {
   var s = String(text || '').replace(/[०-९]/g, function (d) { return '०१२३४५६७८९'.indexOf(d); });
   var m = s.match(/\d+(?:[.,]\d+)?/); var amount = m ? Number(m[0].replace(',', '')) : null;
@@ -263,9 +284,9 @@ function loanBook(txs, rates, asOn) {
 function spendBetween(exps, from, to) { return exps.filter(function (e) { return live(e) && e.expense_date >= from && e.expense_date <= to; }).reduce(function (a, e) { return a + Number(e.amount); }, 0); }
 function dailyAvg(exps, days) { var to = today(), from = addDays(to, -(days - 1)); return spendBetween(exps, from, to) / days; }
 function lastTopup(txs) { var x = (txs || []).filter(function (t) { return t.type === 'fund_add'; }).sort(function (a, b) { return a.transaction_date < b.transaction_date ? 1 : -1; })[0]; return x ? x.transaction_date : null; }
-function nextCashInfo(exps, txs, fund) {
+function nextCashInfo(exps, txs, fund, owed) {
   var lt = lastTopup(txs); var due = lt ? addDays(lt, 15) : today();
-  var spend15 = spendBetween(exps, addDays(today(), -14), today()); var dues = duesTotal(exps);
+  var spend15 = spendBetween(exps, addDays(today(), -14), today()); var dues = owed == null ? duesTotal(exps) : owed;
   var need = Math.max(0, Math.ceil((spend15 + dues - Number(fund || 0)) / 500) * 500);
   return { last: lt, due: due, daysToDue: daysBetween(today(), due), spend15: spend15, dues: dues, suggested: need };
 }
@@ -279,7 +300,7 @@ function monthReport(st, m) {
   var tot = sumAmt(cur), ptot = sumAmt(prev), cats = catTotals(ex, m), pcats = catTotals(ex, prevMonth(m)), flags = [];
   Object.keys(cats).forEach(function (c) { var a = cats[c], b = pcats[c] || 0; if (b > 0 && a - b > 500 && a > b * 1.3) flags.push(catName(c) + ' up ' + Math.round((a / b - 1) * 100) + '% (₹' + money(b) + ' → ₹' + money(a) + ')'); });
   var unv = cur.filter(function (e) { return !e.verified_at; }).length; if (unv) flags.push(unv + ' entries not checked by Shrey');
-  var pend = cur.filter(isPending); if (pend.length) flags.push(pend.length + ' own-pocket entries not yet paid back (₹' + money(sumAmt(pend)) + ')');
+  var bl = balances(ex, st.settlements, (st.hh && st.hh.payers) || []); Object.keys(bl).forEach(function (p) { if (bl[p].bal < 0) flags.push('House owes ' + p + ' ₹' + money(-bl[p].bal)); else if (bl[p].bal > 0) flags.push(p + ' holds advance ₹' + money(bl[p].bal)); });
   var corr = cur.filter(function (e) { return e.entry_kind === 'reversal'; }).length; if (corr) flags.push(corr + ' corrections of closed months');
   var rem = ex.filter(function (e) { return e.removed_at && ym(e.expense_date) === m; }).length; if (rem) flags.push(rem + ' entries removed');
   var added = (st.txs || []).filter(function (x) { return x.type === 'fund_add' && ym(x.transaction_date) === m; }).reduce(function (a, x) { return a + Number(x.amount); }, 0);
@@ -288,7 +309,7 @@ function monthReport(st, m) {
   return { m: m, total: tot, prevTotal: ptot, count: cur.length, cats: cats, cc: ccTotals(ex, m), flags: flags, added: added, loanRow: lrow, loanBalance: lb.balance };
 }
 
-if (typeof module !== 'undefined') module.exports = { loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
+if (typeof module !== 'undefined') module.exports = { balances: balances, owedTotal: owedTotal, advTotal: advTotal, loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
 </script>
 <script>/* ===== Ghar Kharcha v14 — app (screens + actions) ===== */
 var sb = null, sbPromise = null, chan = null, reloadTimer = null;
@@ -303,7 +324,7 @@ function R() { return ST.role; }   // real role for permissions
 function toast(msg, isErr) { var d = document.createElement('div'); d.className = 'toast' + (isErr ? ' err' : ''); d.textContent = msg; document.body.appendChild(d); setTimeout(function () { d.remove(); }, isErr ? 5200 : 2600); }
 function showErr(e) { var m = (e && (e.message || e.error_description)) || String(e); console.error(e); toast(m, true); }
 function guard(fn) { return function () { var a = arguments; try { var r = fn.apply(this, a); if (r && r.catch) r.catch(showErr); return r; } catch (e) { showErr(e); } }; }
-function openModal(html, onClose) { closeModal(); var m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.innerHTML = '<div class="sheet">' + html + '</div>'; m.addEventListener('click', function (e) { if (e.target === m) closeModal(); }); document.body.appendChild(m); ST._onClose = onClose || null; return m; }
+function openModal(html, onClose) { closeModal(); var m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.innerHTML = '<div class="sheet"' + (zoomVal() !== 1 ? ' style="zoom:' + zoomVal() + ';max-height:' + (94 / zoomVal()).toFixed(1) + 'vh"' : '') + '>' + html + '</div>'; m.addEventListener('click', function (e) { if (e.target === m) closeModal(); }); document.body.appendChild(m); ST._onClose = onClose || null; return m; }
 function closeModal() { var m = $('modal'); if (m) m.remove(); if (ST._onClose) { var f = ST._onClose; ST._onClose = null; f(); } }
 function sheetHead(title) { return '<h3><span>' + title + '</span><button class="btn sec mini" data-a="closeModal">✕</button></h3>'; }
 function confirmBox(text, okLbl) { return new Promise(function (res) { openModal(sheetHead('') + '<p style="font-size:18px">' + esc(text) + '</p><div class="actions"><button class="btn" id="cfY">' + esc(okLbl || 'OK') + '</button><button class="btn sec" id="cfN">' + t('cancel') + '</button></div>', function () { res(false); }); $('cfY').onclick = function () { ST._onClose = null; closeModal(); res(true); }; $('cfN').onclick = function () { closeModal(); }; }); }
@@ -358,11 +379,12 @@ async function loadAll() {
     nonGuest ? q(sb.from('cash_checks').select('*').eq('household_id', h).order('created_at', { ascending: false }).limit(100)) : Promise.resolve([]),
     q(sb.from('suggestions').select('*').eq('household_id', h).order('created_at', { ascending: false }).limit(50)),
     adm ? rpc('team_list', { p_household: h }) : Promise.resolve([]),
-    adm ? q(sb.from('backups').select('id,created_at,kind').eq('household_id', h).order('created_at', { ascending: false }).limit(12)) : Promise.resolve([])
+    adm ? q(sb.from('backups').select('id,created_at,kind').eq('household_id', h).order('created_at', { ascending: false }).limit(12)) : Promise.resolve([]),
+    ST.role === 'owner' ? rpc('alert_status', { p_household: h }) : Promise.resolve(null)
   ];
   var r = await Promise.all(jobs.map(function (p) { return p.catch(function (e) { console.warn(e); return null; }); }));
   ST.wallet = r[0] || { fund: 0 }; ST.expenses = r[1] || []; ST.txs = r[2] || []; ST.settlements = r[3] || []; ST.closes = r[4] || []; ST.checks = r[5] || [];
-  ST.suggestions = r[6] || []; ST.team = r[7] || []; ST.backups = r[8] || [];
+  ST.suggestions = r[6] || []; ST.team = r[7] || []; ST.backups = r[8] || []; ST.alert = r[9] || null;
 }
 function subscribe() {
   try {
@@ -374,11 +396,13 @@ function subscribe() {
     chan.subscribe();
   } catch (e) { console.warn('realtime', e); }
 }
-async function refresh() { if (!ST.user) return; try { var prevRole = ST.role; ST.status = await rpc('my_status'); if (ST.status) { ST.hh = ST.status.household; ST.role = ST.status.role; if (prevRole !== ST.role && !ST.viewAs) LANG = ST.status.lang || DEF_LANG[ST.role] || 'hg'; } if (ST.role && ST.role !== 'pending') await loadAll(); render(); } catch (e) { showErr(e); } }
+async function refresh() { if (!ST.user) return; lastRefresh = Date.now(); try { var prevRole = ST.role; ST.status = await rpc('my_status'); if (ST.status) { ST.hh = ST.status.household; ST.role = ST.status.role; if (prevRole !== ST.role && !ST.viewAs) LANG = ST.status.lang || DEF_LANG[ST.role] || 'hg'; } if (ST.role && ST.role !== 'pending') await loadAll(); render(); } catch (e) { showErr(e); } }
 
 /* ---------- derived ---------- */
 function fund() { return Number(ST.wallet.fund || 0); }
-function dues() { return duesTotal(ST.expenses); }
+function bals() { return balances(ST.expenses, ST.settlements, payers()); }
+function dues() { return owedTotal(bals()); }
+function advances() { return advTotal(bals()); }
 function free() { return fund() - dues(); }
 function cm() { return today().slice(0, 7); }
 function payers() { return (ST.hh && ST.hh.payers) || ['Mamta', 'Shreyansh', 'Shrey']; }
@@ -389,6 +413,14 @@ function pendingApprovals() { return ST.settlements.filter(function (s) { return
 function lastCheck() { return ST.checks[0] || null; }
 function memberName(uid) { var m = ST.team.filter(function (x) { return x.user_id === uid; })[0]; return m ? m.display_name : ''; }
 
+/* ---------- text size & auto refresh ---------- */
+function curSize() { var v = Number(lsGet('gk-size')); if (v) return v; return ST.role === 'member' ? 1.3 : 1; }
+function zoomVal() { return (!ST.viewAs && ST.user && ST.role) ? curSize() : 1; }
+function applySize() { render(); }
+var lastRefresh = 0;
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && ST.user && ST.role && Date.now() - lastRefresh > 15000) refresh(); });
+window.addEventListener('pageshow', function (e) { if (e.persisted && ST.user) refresh(); });
+setInterval(function () { if (document.visibilityState === 'visible' && ST.user && ST.role && ST.role !== 'pending' && !$('modal') && Date.now() - lastRefresh > 120000) refresh(); }, 30000);
 /* ---------- render ---------- */
 function render() {
   var app = $('app'); if (!app) return;
@@ -400,27 +432,27 @@ function render() {
   else if (ST.role === 'pending') v = viewPending();
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
+  var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function header(extra) {
   var r = role(), langs = [['hi', 'हिंदी'], ['hg', 'Hinglish'], ['en', 'English']];
   return '<div class="card"><div class="row sp"><div class="grow"><b style="font-size:17px">' + t('hello') + ', ' + esc(myName().split(' ')[0] || '') + (LANG === 'hi' ? ' जी' : '') + ' 🙏</b><div class="muted small">' + esc(ST.hh.name) + ' · ' + ROLE_LBL[r] + '</div></div>' +
     '<div class="row"><div class="lang">' + langs.map(function (l) { return '<button class="' + (LANG === l[0] ? 'on' : '') + '" data-a="lang" data-v="' + l[0] + '">' + l[1] + '</button>'; }).join('') + '</div></div></div>' +
-    '<div class="row" style="margin-top:9px">' + (extra || '') + '<button class="btn sec mini" data-a="refresh">↻ ' + t('refresh') + '</button><button class="btn sec mini" data-a="logout">' + t('logout') + '</button></div></div>';
+    '<div class="row" style="margin-top:9px"><div class="lang"><button data-a="size" data-v="1" class="' + (curSize() == 1 ? 'on' : '') + '" style="font-size:11px">A</button><button data-a="size" data-v="1.15" class="' + (curSize() == 1.15 ? 'on' : '') + '" style="font-size:14px">A</button><button data-a="size" data-v="1.3" class="' + (curSize() == 1.3 ? 'on' : '') + '" style="font-size:17px">A</button></div>' + (extra || '') + '<button class="btn sec mini" data-a="refresh">↻ ' + t('refresh') + '</button><button class="btn sec mini" data-a="logout">' + t('logout') + '</button></div></div>';
 }
 function cashCard(big) {
   var f = free();
-  return '<div class="cash ' + (LANG === 'hi' ? 'hi' : '') + '"><div class="lbl">' + t('cashInHand') + '</div><div class="big">₹' + money(f) + '</div><div class="sub">' + t('fund') + ' ₹' + money(fund()) + ' · ' + t('dues') + ' ₹' + money(dues()) + '</div></div>';
+  return '<div class="cash ' + (LANG === 'hi' ? 'hi' : '') + '"><div class="lbl">' + t('cashInHand') + '</div><div class="big">₹' + money(f) + '</div><div class="sub">' + t('fund') + ' ₹' + money(fund()) + ' · ' + t('dues') + ' ₹' + money(dues()) + (advances() ? ' · ' + t('cashWithPeople') + ' ₹' + money(advances()) : '') + '</div></div>';
 }
 function lowCashBanner() {
-  var f = free(), d = runwayDays(ST.expenses, f);
-  if (f <= 0) return '<div class="banner red">⚠️ ' + t('cashOut') + '</div>';
-  if (d !== null && d < 1) return '<div class="banner red">🔴 ' + t('cashToday') + '</div>';
-  if (d !== null && d < 7) return '<div class="banner ' + (d < 3 ? 'red' : 'org') + '">' + (d < 3 ? '🔴 ' : '🟠 ') + t('daysLeft', { d: d }) + '</div>';
-  return '';
+  var thr = ST.hh && ST.hh.low_fund_threshold; if (thr == null || role() === 'guest') return '';
+  var f = fund(); if (f >= Number(thr)) return '';
+  var msg = '🏠 Ghar Kharcha: fund ₹' + money(f) + ' (limit ₹' + money(thr) + ' se kam). Dena baaki ₹' + money(dues()) + '. Kripya paisa bhejein.';
+  return '<div class="banner red">⚠️ ' + t('lowFund', { f: money(f), l: money(thr) }) + (R() !== 'owner' ? '<div style="margin-top:6px"><a class="btn mini sec" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(msg) + '">' + t('tellBhaiya') + '</a></div>' : '') + '</div>';
 }
 function nextCashBanner(withBtn) {
-  var n = nextCashInfo(ST.expenses, ST.txs, fund()); if (!n.last) return '';
+  var n = nextCashInfo(ST.expenses, ST.txs, fund(), dues()); if (!n.last) return '';
   if (n.daysToDue > 2) return '<div class="banner blue">📅 ' + t('nextCash', { d: prettyDate(n.due) }) + '</div>';
   var wa = encodeURIComponent('🏠 ' + ST.hh.name + ': agla ghar ka paisa ' + prettyDate(n.due) + ' ko due hai. Pichhle 15 din kharcha ₹' + money(n.spend15) + ', dena baaki ₹' + money(n.dues) + ', abhi fund ₹' + money(fund()) + '. Suggested top-up: ₹' + money(n.suggested));
   return '<div class="banner org">📅 ' + t('nextCash', { d: prettyDate(n.due) }) + ' — ' + t('suggested', { a: money(n.suggested) }) + '<div class="small" style="font-weight:normal;margin-top:4px">15 din kharcha ₹' + money(n.spend15) + ' + dues ₹' + money(n.dues) + ' − fund ₹' + money(fund()) + '</div>' +
@@ -431,7 +463,7 @@ function nextCashBanner(withBtn) {
 function entryRow(e) {
   var stt = entryStatus(e, ST.closes);
   var chips = '<span class="chip ' + stt + '">' + t('status_' + stt) + '</span>';
-  if (e.paid_by && e.paid_by !== 'fund') chips += '<span class="chip">' + esc(pName(e.paid_by)) + ' · ' + t('ownPocket') + (e.settlement_id ? ' ✓' : '') + '</span>';
+  if (e.paid_by && e.paid_by !== 'fund') chips += '<span class="chip">' + esc(pName(e.paid_by)) + ' · ' + t('ownPocket') + '</span>';
   if (e.entry_kind === 'reversal' || e.entry_kind === 'replacement') chips += '<span class="chip">↩ ' + t('correct') + '</span>';
   if (e.edit_count) chips += '<span class="chip">✏️×' + e.edit_count + '</span>';
   if (e.photo_url) chips += '<span class="chip">📷</span>';
@@ -441,14 +473,16 @@ function listWithMore(key, rows, rowFn, n) { n = n || 10; var all = ST.more[key]
 function recentCard(title) {
   var rows = ST.expenses.slice(); return '<div class="card"><h2>' + (title || t('recent')) + '</h2><div class="list ' + (LANG === 'hi' ? 'hi-big' : '') + '">' + listWithMore('recent', rows, entryRow) + '</div></div>';
 }
+function balLine(p, b) { return b === 0 ? t('settled0') : b < 0 ? t('oweTo', { p: pName(p) }) + ' ₹' + money(-b) : t('advWith', { p: pName(p) }) + ' ₹' + money(b); }
 function duesCard() {
-  var d = duesBy(ST.expenses), keys = Object.keys(d), canSettle = role() !== 'guest';
-  var h = keys.length ? keys.map(function (p) {
-    var self = p === 'Mamta' && R() === 'member';
-    return '<div class="it" style="cursor:default"><div class="ic">💵</div><div class="tx"><b>' + esc(pName(p)) + '</b><small>' + d[p].items.length + ' ' + t('entries') + '</small></div><div class="am">₹' + money(d[p].total) + '</div>' + (canSettle ? '<button class="btn green mini" data-a="settle" data-p="' + esc(p) + '">' + (self ? t('settleSelf') : t('paidBack')) + '</button>' : '') + '</div>';
-  }).join('') : '<div class="muted">' + t('noDues') + '</div>';
+  var b = bals(), keys = payers().filter(function (p) { return b[p]; }), canAct = role() !== 'guest';
+  var h = keys.map(function (p) {
+    var v = b[p].bal, col = v < 0 ? '#842029' : v > 0 ? '#21405f' : '#2d5a27';
+    return '<div class="it" style="cursor:default;flex-wrap:wrap"><div class="ic">💵</div><div class="tx"><b>' + esc(pName(p)) + '</b><small style="color:' + col + ';font-size:14px">' + esc(balLine(p, v)) + '</small></div>' +
+      (canAct ? '<div class="row"><button class="btn green mini" data-a="pay" data-p="' + esc(p) + '">' + t('give') + '</button>' + (v > 0 ? '<button class="btn sec mini" data-a="giveBack" data-p="' + esc(p) + '">' + t('gotBack') + '</button>' : '') + '</div>' : '') + '</div>';
+  }).join('');
   var appr = pendingApprovals(); if (appr.length) h += '<div class="small muted" style="margin-top:6px">⏳ ' + t('awaitingShrey') + ': ' + appr.map(function (s) { return '₹' + money(s.amount); }).join(', ') + '</div>';
-  return '<div class="card"><h2>' + t('whoToPay') + '</h2><div class="list">' + h + '</div></div>';
+  return '<div class="card"><h2>' + t('accounts') + '</h2><div class="list">' + h + '</div></div>';
 }
 function monthSummaryCard() {
   var a = sumAmt(monthExp(ST.expenses, cm())), b = sumAmt(monthExp(ST.expenses, prevMonth(cm())));
@@ -490,21 +524,21 @@ function todoCard() {
 function viewShrey() {
   return header() + lowCashBanner() + todoCard() + cashCard() +
     '<div class="card"><div class="actions"><button class="btn" data-a="addExp">' + t('addExpense') + '</button><button class="btn green" data-a="topup">' + t('addTopup') + '</button><button class="btn sec" data-a="cashCheck">💰 ' + t('cashCount') + '</button><button class="btn sec" data-a="report">📤 ' + t('sendReport') + '</button></div></div>' +
-    nextCashBanner(true) + duesCard() + recentCard() + monthSummaryCard() + ccCard() + backupsCard();
+    duesCard() + recentCard() + monthSummaryCard() + ccCard() + backupsCard();
 }
 function viewGuest() {
   return header('<span class="chip">' + t('viewOnly') + '</span>') + monthSummaryCard() + chartsCard() + ccCard() + recentCard() + suggestionsCard();
 }
 function viewOwner() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today()), u = unverified(), a = pendingApprovals(), pend = ST.team.filter(function (m) { return m.role === 'pending'; });
-  var al = lowCashBanner() + nextCashBanner(true);
+  var al = lowCashBanner();
   if (pend.length) al += '<div class="banner blue">🙋 ' + pend.length + ' join request(s) waiting — see Team below.</div>';
   if (u.some(function (e) { return daysBetween(e.expense_date, today()) > 7; })) al += '<div class="banner org">🔎 Some of Mamta\'s entries are unchecked for 7+ days (' + u.length + ' total).</div>';
   if (a.length) al += '<div class="banner org">🧾 ' + a.length + ' self-settlement(s) waiting for Shrey.</div>';
   var lc = lastCheck(); if (lc && Number(lc.diff) !== 0) al += '<div class="banner red">💰 Last cash count (' + prettyDate(lc.check_date) + ') differs by ₹' + money(lc.diff) + '.</div>';
   var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member">Mamta</option><option value="admin">Shrey</option><option value="guest">Guest</option></select>';
   return header(sel) + al +
-    '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Dues</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
+    '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Owed to people</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>' + t('cashWithPeople') + '</span><b>₹' + money(advances()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
     '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">Loan wapsi</button><button class="btn sec" data-a="fundFix">Galti sudhaar</button></div></div>' +
     insightsCard() + duesCard() + todoCard() + passbookCard(lb) + entriesCard() + ccCard() + chartsCard() + closeCard() + historyCard() + teamCard() + settingsCard() + backupsCard() + suggestionsCard() + exportCard();
 }
@@ -610,6 +644,7 @@ function teamCard() {
 function settingsCard() {
   var rates = (ST.hh.loan_rates || []).map(function (r) { return 'from ' + r.from + ': ' + r.rate + '%'; }).join(' · ');
   return '<div class="card"><h2>Settings</h2><div class="grid2"><div class="field"><label>HOUSEHOLD NAME</label><input id="setName" value="' + esc(ST.hh.name) + '"></div><div class="field"><label>MONTHLY STATEMENT EMAIL</label><input id="setEmail" type="email" value="' + esc(ST.hh.report_email || '') + '"></div></div><button class="btn sec" data-a="saveSettings">Save</button>' +
+    '<h3 style="margin:16px 0 6px;font-size:15px;color:var(--dark)">🔔 Low-fund alert</h3><div class="grid2"><div class="field"><label>ALERT WHEN FUND BELOW ₹ (empty = off)</label><input id="alThr" type="number" inputmode="decimal" value="' + (ST.alert && ST.alert.threshold != null ? ST.alert.threshold : '') + '"></div><div class="field"><label>YOUR WHATSAPP NUMBER</label><input id="alPhone" type="tel" placeholder="+919876543210" value="' + esc((ST.alert && ST.alert.wa_phone) || '') + '"></div><div class="field full"><label>CALLMEBOT API KEY ' + (ST.alert && ST.alert.wa_key_set ? '(saved ✓ — leave empty to keep)' : '') + '</label><input id="alKey" placeholder="' + (ST.alert && ST.alert.wa_key_set ? '••••••' : 'e.g. 1234567') + '"></div></div><div class="actions"><button class="btn sec" data-a="saveAlert">Save alert</button><button class="btn sec" data-a="testAlert">Send test</button></div><div class="small muted" style="margin-top:6px">One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message <b>I allow callmebot to send me messages</b>, and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.</div>' +
     '<div style="margin-top:12px" class="small">Loan rate: ' + esc(rates) + '</div><div class="row" style="margin-top:6px"><input id="rateFrom" type="date" value="' + (nextMonth(cm()) + '-01') + '" style="padding:7px"><input id="rateVal" type="number" step="0.05" min="0" max="10" placeholder="% / month" style="padding:7px;width:110px"><button class="btn sec mini" data-a="addRate">Add new rate</button></div><div class="small muted">New rates apply from a date this month or later; past months never change.</div></div>';
 }
 function backupsCard() {
@@ -737,12 +772,24 @@ async function showPhoto(id) {
 }
 
 /* ---------- settle / verify / approve / cash / topup ---------- */
-function settleModal(payee) {
-  var d = duesBy(ST.expenses)[payee]; if (!d) return;
-  openModal(sheetHead(t('paidBack') + ' — ' + esc(pName(payee))) + '<div class="list">' + d.items.map(function (e) { return '<label class="it" style="cursor:pointer"><input type="checkbox" class="sx" value="' + e.id + '" data-a2="' + e.amount + '" checked style="width:22px;height:22px"><div class="tx"><b>' + esc(e.note || catName(e.category)) + '</b><small>' + prettyDate(e.expense_date) + '</small></div><div class="am">₹' + money(e.amount) + '</div></label>'; }).join('') + '</div><p style="font-size:18px" id="sxTot"></p><button class="btn huge green" id="sxGo">' + t('yesPaid') + '</button><div class="small muted" style="margin-top:6px">' + (payee === 'Mamta' && R() === 'member' ? t('awaitingShrey') : '') + '</div>');
-  var upd = function () { var s = 0; document.querySelectorAll('.sx').forEach(function (c) { if (c.checked) s += Number(c.dataset.a2); }); $('sxTot').textContent = t('confirmPay', { a: money(s), p: pName(payee) }); return s; };
-  document.querySelectorAll('.sx').forEach(function (c) { c.onchange = upd; }); upd();
-  $('sxGo').onclick = guard(async function () { var ids = []; document.querySelectorAll('.sx').forEach(function (c) { if (c.checked) ids.push(c.value); }); if (!ids.length) return; busy($('sxGo'), true); try { await rpc('settle_dues', { p_household: ST.hh.id, p_payee: payee, p_ids: ids }); } catch (e) { busy($('sxGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
+function payModal(p) {
+  var b = (bals()[p] || { bal: 0 }).bal, owed = Math.max(0, -b), self = p === 'Mamta' && R() === 'member';
+  var rounds = []; if (owed > 0) { [100, 500, 1000].forEach(function (u) { var x = Math.ceil(owed / u) * u; if (x > owed && rounds.indexOf(x) < 0) rounds.push(x); }); }
+  openModal(sheetHead(t('give') + ' — ' + esc(pName(p))) + '<p style="font-size:17px">' + esc(balLine(p, b)) + '</p>' +
+    '<div class="field"><label>' + t('howMuchGive') + '</label><input id="pyAmt" class="amount-big" type="number" inputmode="decimal" value="' + (owed || '') + '"></div>' +
+    (rounds.length ? '<div class="seg" style="margin-bottom:10px">' + [owed].concat(rounds).map(function (x) { return '<button type="button" data-ra="' + x + '">₹' + money(x) + '</button>'; }).join('') + '</div>' : '') +
+    '<div id="pyAfter" style="font-size:16px;margin-bottom:10px"></div><div class="field"><label>' + t('note') + '</label><input id="pyNote"></div>' +
+    '<div class="field"><span class="small muted">' + t('date') + ': </span><input id="pyDate" type="date" max="' + today() + '" value="' + today() + '" style="padding:6px"></div>' +
+    '<button class="btn huge green" id="pyGo">' + t('save') + '</button>' + (self ? '<div class="small muted" style="margin-top:6px">' + t('awaitingShrey') + '</div>' : ''));
+  var upd = function () { var a = Number($('pyAmt').value) || 0; $('pyAfter').textContent = a > 0 ? t('afterPay', { x: balLine(p, Math.round((b + a) * 100) / 100) }) : ''; };
+  document.querySelectorAll('[data-ra]').forEach(function (x) { x.onclick = function () { $('pyAmt').value = x.dataset.ra; upd(); }; });
+  $('pyAmt').oninput = upd; upd();
+  $('pyGo').onclick = guard(async function () { var a = Number($('pyAmt').value); if (!(a > 0)) return toast(t('amountBad'), true); busy($('pyGo'), true); try { await rpc('pay_person', { p_household: ST.hh.id, p_person: p, p_amount: a, p_date: $('pyDate').value, p_note: $('pyNote').value.trim() }); } catch (e) { busy($('pyGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
+}
+function returnModal(p) {
+  var b = (bals()[p] || { bal: 0 }).bal;
+  openModal(sheetHead(t('gotBack') + ' — ' + esc(pName(p))) + '<p style="font-size:17px">' + esc(balLine(p, b)) + '</p><div class="field"><label>' + t('howMuchBack') + '</label><input id="rtAmt" class="amount-big" type="number" inputmode="decimal" value="' + (b > 0 ? b : '') + '"></div><div class="field"><label>' + t('note') + '</label><input id="rtNote"></div><button class="btn huge" id="rtGo">' + t('save') + '</button>');
+  $('rtGo').onclick = guard(async function () { var a = Number($('rtAmt').value); if (!(a > 0)) return toast(t('amountBad'), true); await rpc('person_return', { p_household: ST.hh.id, p_person: p, p_amount: a, p_note: $('rtNote').value.trim() }); closeModal(); toast(t('saved')); await refresh(); });
 }
 function verifyModal() {
   var u = unverified();
@@ -750,7 +797,7 @@ function verifyModal() {
 }
 function approveModal() {
   var a = pendingApprovals();
-  openModal(sheetHead(t('toApprove', { n: a.length })) + '<div class="list">' + a.map(function (s) { var items = ST.expenses.filter(function (e) { return e.settlement_id === s.id; }); return '<div class="it" style="cursor:default"><div class="tx"><b>' + esc(pName(s.payee)) + ' · ₹' + money(s.amount) + '</b><small>' + prettyDate(s.settle_date) + ' · ' + items.map(function (e) { return esc(e.note || catName(e.category)) + ' ₹' + money(e.amount); }).join(', ') + '</small></div><button class="btn green mini" data-a="approveOne" data-id="' + s.id + '">' + t('approve') + '</button></div>'; }).join('') + '</div>');
+  openModal(sheetHead(t('toApprove', { n: a.length })) + '<div class="list">' + a.map(function (s) { var items = ST.expenses.filter(function (e) { return e.settlement_id === s.id; }); return '<div class="it" style="cursor:default"><div class="tx"><b>' + esc(pName(s.payee)) + ' · ₹' + money(s.amount) + '</b><small>' + prettyDate(s.settle_date) + (s.note ? ' · ' + esc(s.note) : '') + (items.length ? ' · ' + items.map(function (e) { return esc(e.note || catName(e.category)) + ' ₹' + money(e.amount); }).join(', ') : '') + '</small></div><button class="btn green mini" data-a="approveOne" data-id="' + s.id + '">' + t('approve') + '</button></div>'; }).join('') + '</div>');
 }
 function cashCheckModal() {
   openModal(sheetHead('💰 ' + t('cashCount')) + '<p>App: <b>₹' + money(fund()) + '</b></p><div class="field"><label>' + t('counted') + '</label><input id="ccCount" class="amount-big" type="number" inputmode="decimal"></div><div class="field"><label>' + t('note') + '</label><input id="ccNote"></div><div id="ccDiff" style="font-size:17px;margin-bottom:8px"></div><button class="btn huge" id="ccGo">' + t('save') + '</button>');
@@ -758,14 +805,14 @@ function cashCheckModal() {
   $('ccGo').onclick = guard(async function () { if ($('ccCount').value === '') return; await rpc('cash_check', { p_household: ST.hh.id, p_counted: Number($('ccCount').value), p_note: $('ccNote').value.trim() }); closeModal(); toast(t('saved')); await refresh(); });
 }
 function topupModal() {
-  var adj = (duesBy(ST.expenses)['Shreyansh'] || { items: [] }).items, n = nextCashInfo(ST.expenses, ST.txs, fund());
-  openModal(sheetHead(t('addTopup')) + '<p class="small muted">' + t('suggested', { a: money(n.suggested) }) + ' (15 din ₹' + money(n.spend15) + ' + dues ₹' + money(n.dues) + ' − fund ₹' + money(fund()) + ')</p>' +
-    '<div class="field"><label>CASH GIVEN TO MUMMY ₹</label><input id="tuAmt" class="amount-big" type="number" inputmode="decimal" value="' + (n.suggested || '') + '"></div>' +
+  var owedS = Math.max(0, -((bals()['Shreyansh'] || { bal: 0 }).bal)), n = nextCashInfo(ST.expenses, ST.txs, fund(), dues());
+  openModal(sheetHead(t('addTopup')) + '<p class="small muted">Fund ₹' + money(fund()) + (ST.hh.low_fund_threshold != null ? ' · limit ₹' + money(ST.hh.low_fund_threshold) : '') + ' · dues ₹' + money(dues()) + '</p>' +
+    '<div class="field"><label>CASH GIVEN TO MUMMY ₹</label><input id="tuAmt" class="amount-big" type="number" inputmode="decimal"></div>' +
     '<div class="field"><label>SOURCE</label><select id="tuSrc"><option value="shreyansh">Shreyansh (loan, ' + rateOn(ST.hh.loan_rates, today()) + '%/month)</option><option value="business">Business income (not a loan)</option></select></div>' +
     '<div class="field"><label>' + t('date') + '</label><input id="tuDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="tuNote"></div>' +
-    (adj.length ? '<div class="field"><label>ADJUST SHREYANSH\'S OWN-POCKET DUES IN THIS TOP-UP</label>' + adj.map(function (e) { return '<label class="row" style="padding:4px 0"><input type="checkbox" class="tuAdj" value="' + e.id + '" data-a2="' + e.amount + '"> ' + prettyDate(e.expense_date) + ' · ' + esc(e.note || catName(e.category)) + ' · ₹' + money(e.amount) + '</label>'; }).join('') + '<div class="small muted">Adjusted dues are settled and added to the loan, without cash moving.</div></div>' : '') +
+    (owedS > 0 ? '<div class="field"><label>ADJUST WHAT THE HOUSE OWES SHREYANSH (₹' + money(owedS) + ') — added to loan, no cash moves</label><input id="tuAdj" type="number" inputmode="decimal" value="' + owedS + '"></div>' : '') +
     '<button class="btn huge green" id="tuGo">' + t('save') + '</button>');
-  $('tuGo').onclick = guard(async function () { var ids = []; document.querySelectorAll('.tuAdj').forEach(function (c) { if (c.checked) ids.push(c.value); }); var a = Number($('tuAmt').value) || 0; if (!(a > 0) && !ids.length) return toast(t('amountBad'), true); busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_ids: ids.length ? ids : null }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
+  $('tuGo').onclick = guard(async function () { var adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0, a = Number($('tuAmt').value) || 0; if (!(a > 0) && !(adj > 0)) return toast(t('amountBad'), true); busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_amount: adj }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
 }
 function repayModal() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today());
@@ -824,9 +871,9 @@ function monthReportModal(m) {
 }
 function supervisorReport() {
   var lc = ST.checks[1] || null, from = lc ? lc.check_date : addDays(today(), -14), cur = ST.checks[0];
-  var spend = spendBetween(ST.expenses, from, today()), cnt = ST.expenses.filter(function (e) { return live(e) && e.expense_date >= from; }).length, d = duesBy(ST.expenses), u = unverified(), ap = pendingApprovals(), n = nextCashInfo(ST.expenses, ST.txs, fund());
+  var spend = spendBetween(ST.expenses, from, today()), cnt = ST.expenses.filter(function (e) { return live(e) && e.expense_date >= from; }).length, d = bals(), u = unverified(), ap = pendingApprovals(), n = nextCashInfo(ST.expenses, ST.txs, fund(), dues());
   var txt = '📋 *Supervisor report* — ' + ST.hh.name + '\n' + prettyDate(from) + ' → ' + prettyDate(today()) + '\n\nKharcha: ₹' + money(spend) + ' (' + cnt + ' entries)\nFund (app): ₹' + money(fund()) + (cur ? '\nCash gina (' + prettyDate(cur.check_date) + '): ₹' + money(cur.counted) + ' · farak ₹' + money(cur.diff) : '\nCash ginti: abhi nahi hui') +
-    '\nDena baaki: ' + (Object.keys(d).length ? Object.keys(d).map(function (p) { return pName(p) + ' ₹' + money(d[p].total); }).join(', ') : 'kuch nahi') + '\nSelf-settlement baaki: ' + ap.length + '\nCheck baaki entries: ' + u.length + '\n\nAgla paisa: ' + prettyDate(n.due) + ' · suggested ₹' + money(n.suggested);
+    '\nLog: ' + payers().filter(function (p) { return d[p]; }).map(function (p) { return balLine(p, d[p].bal); }).join(', ') + '\nSelf-settlement baaki: ' + ap.length + '\nCheck baaki entries: ' + u.length + (ST.hh.low_fund_threshold != null ? '\nFund limit: ₹' + money(ST.hh.low_fund_threshold) : '');
   openModal(sheetHead('📤 ' + t('sendReport')) + '<pre style="white-space:pre-wrap;font-family:inherit;background:var(--paper2);padding:10px;border-radius:8px">' + esc(txt) + '</pre><div class="actions"><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(txt) + '">📤 WhatsApp</a><button class="btn sec" id="srPdf">📄 PDF</button></div>');
   $('srPdf').onclick = function () { printHtml('Supervisor report', '<h1>Supervisor report</h1><pre style="font-size:14px;white-space:pre-wrap">' + esc(txt) + '</pre>'); };
 }
@@ -871,7 +918,8 @@ var A = {
   verifyAll: async function () { await rpc('verify_expenses', { p_ids: unverified().map(function (e) { return e.id; }) }); closeModal(); await refresh(); toast(t('allDone')); },
   verifyList: verifyModal, approveList: approveModal,
   approveOne: async function (el) { await rpc('approve_settlement', { p_id: el.dataset.id }); closeModal(); await refresh(); toast('✓'); },
-  settle: function (el) { settleModal(el.dataset.p); },
+  settle: function (el) { payModal(el.dataset.p); }, pay: function (el) { payModal(el.dataset.p); }, giveBack: function (el) { returnModal(el.dataset.p); },
+  size: function (el) { lsSet('gk-size', el.dataset.v); applySize(); },
   cashCheck: cashCheckModal, topup: topupModal, repay: repayModal, fundFix: fundFixModal, report: supervisorReport, passbookRO: passbookRO,
   stPdf: statementPdf, stXls: statementXls, stWa: statementWa, xlsAll: xlsAll,
   jsonAll: function () { download('ghar-kharcha-' + today() + '.json', JSON.stringify({ app: 'ghar-kharcha-online', version: 14, exportedAt: new Date().toISOString(), household: ST.hh, wallet: ST.wallet, expenses: ST.expenses, transactions: ST.txs, settlements: ST.settlements, month_closes: ST.closes, cash_checks: ST.checks }, null, 1)); },
@@ -890,6 +938,8 @@ var A = {
   regen: async function () { if (!(await confirmBox('Make new family and guest codes? Old codes stop working.', 'Yes'))) return; var r = await rpc('regen_codes', { p_household: ST.hh.id }); toast('New codes: ' + r.join_code + ' / ' + r.guest_code); await refresh(); },
   saveSettings: async function () { await rpc('update_household', { p_household: ST.hh.id, p_name: $('setName').value.trim(), p_report_email: $('setEmail').value.trim() }); toast('Saved'); await refresh(); },
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
+  saveAlert: async function () { var v = $('alThr').value.trim(); var r = await rpc('set_fund_alert', { p_household: ST.hh.id, p_threshold: v === '' ? null : Number(v), p_phone: $('alPhone').value.trim() || null, p_apikey: $('alKey').value.trim() || null }); toast(r.sent_now ? 'Saved — fund is already below the limit, alert sent' : 'Alert saved'); await refresh(); },
+  testAlert: async function () { var r = await rpc('test_fund_alert', { p_household: ST.hh.id }); toast('Test sent: ' + (r || 'nothing configured')); },
   ccEdit: async function () { var v = prompt('Cost centres (comma separated):', ccList().join(', ')); if (v === null) return; var list = uniq(v.split(',').map(function (x) { return x.trim(); })); if (list.indexOf('Household') < 0) list.unshift('Household'); await rpc('set_cost_centres', { p_household: ST.hh.id, p_list: list }); await refresh(); }
 };
 document.addEventListener('click', function (ev) {
