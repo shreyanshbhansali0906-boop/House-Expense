@@ -95,7 +95,7 @@ var PEOPLE = { // display names for payers / cost centres
 };
 var LANG = 'en';
 var T = {
-  hello: { en: 'Hello', hg: 'Namaste', hi: 'नमस्ते' },
+  hello: { en: 'Jai Jinendra', hg: 'Jai Jinendra', hi: 'जय जिनेन्द्र' },
   cashInHand: { en: 'Free cash in hand', hg: 'Mummy ke paas free cash', hi: 'आपके पास कैश' },
   fund: { en: 'Fund', hg: 'Fund', hi: 'कुल फंड' }, dues: { en: 'Dues', hg: 'Dena baaki', hi: 'देना बाकी' },
   addExpense: { en: '+ Add expense', hg: '+ Kharcha likho', hi: '+ खर्चा लिखो' },
@@ -109,6 +109,7 @@ var T = {
   whoPaid: { en: 'Who paid?', hg: 'Paise kisne diye?', hi: 'पैसे किसने दिए?' }, forWhom: { en: 'For whom?', hg: 'Kiske liye?', hi: 'किसके लिए?' },
   houseFund: { en: 'House fund', hg: 'Ghar ka fund', hi: 'घर का फंड' }, ownPocket: { en: 'own pocket', hg: 'apni jeb', hi: 'अपनी जेब' },
   note: { en: 'Note (optional)', hg: 'Note (zaroori nahi)', hi: 'नोट (ज़रूरी नहीं)' }, date: { en: 'Date', hg: 'Tareekh', hi: 'तारीख' },
+  takePhoto: { en: 'Camera', hg: 'Camera', hi: 'कैमरा' }, fromGallery: { en: 'Gallery', hg: 'Gallery', hi: 'गैलरी' }, photoAdded: { en: 'Photo added', hg: 'Photo lag gayi', hi: 'फ़ोटो लग गई' },
   changeDate: { en: 'Change date', hg: 'Tareekh badlo', hi: 'तारीख बदलें' }, billPhoto: { en: '📷 Bill photo', hg: '📷 Bill ki photo', hi: '📷 बिल की फ़ोटो' },
   save: { en: 'Save ✓', hg: 'Save karo ✓', hi: 'सेव करें ✓' }, cancel: { en: 'Cancel', hg: 'Rehne do', hi: 'रहने दो' },
   quick: { en: '🎤 Speak or type: "sabzi 350"', hg: '🎤 Bolo ya likho: "sabzi 350"', hi: '🎤 बोलें या लिखें: "सब्ज़ी 350"' },
@@ -586,7 +587,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
 }
 function header(extra) {
   var r = role(), langs = [['hi', 'हिंदी'], ['hg', 'Hinglish'], ['en', 'English']];
-  return '<div class="card"><div class="row sp"><div class="grow"><b style="font-size:17px">' + t('hello') + ', ' + esc(myName().split(' ')[0] || '') + (LANG === 'hi' ? ' जी' : '') + ' 🙏</b><div class="muted small">' + esc(ST.hh.name) + ' · ' + ROLE_LBL[r] + '</div></div>' +
+  return '<div class="card"><div class="row sp"><div class="grow" style="flex:1 1 210px"><b style="font-size:17px">' + t('hello') + ', ' + esc(myName().split(' ')[0] || '') + (LANG === 'hi' ? ' जी' : '') + ' 🙏</b><div class="muted small">' + esc(ST.hh.name) + ' · ' + ROLE_LBL[r] + '</div></div>' +
     '<div class="row"><div class="lang">' + langs.map(function (l) { return '<button class="' + (LANG === l[0] ? 'on' : '') + '" data-a="lang" data-v="' + l[0] + '">' + l[1] + '</button>'; }).join('') + '</div></div></div>' +
     '<div class="row" style="margin-top:9px"><div class="lang"><button data-a="size" data-v="1" class="' + (curSize() == 1 ? 'on' : '') + '" style="font-size:11px">A</button><button data-a="size" data-v="1.15" class="' + (curSize() == 1.15 ? 'on' : '') + '" style="font-size:14px">A</button><button data-a="size" data-v="1.3" class="' + (curSize() == 1.3 ? 'on' : '') + '" style="font-size:17px">A</button></div>' + (extra || '') + '<button class="btn sec mini" data-a="refresh">↻ ' + t('refresh') + '</button><button class="btn sec mini" data-a="logout">' + t('logout') + '</button></div></div>';
 }
@@ -833,9 +834,17 @@ function expenseForm(e) {
     '<div class="field"><label>' + t('category') + '</label><div class="cats" id="fCats">' + Object.keys(CATS).map(function (c) { return '<button type="button" class="cat ' + (c === cat ? 'on' : '') + '" data-cat="' + c + '"><span class="e">' + catIcon(c) + '</span>' + esc(catName(c)) + '</button>'; }).join('') + '</div></div>' +
     '<div class="field"><label>' + t('whoPaid') + '</label><div class="seg" id="fPay">' + payOpts.map(function (o) { return '<button type="button" class="' + (o[0] === payer ? 'on' : '') + '" data-p="' + esc(o[0]) + '"' + (locked ? ' disabled' : '') + '>' + esc(o[1]) + '</button>'; }).join('') + '</div></div>' +
     '<div class="field"><label>' + t('forWhom') + '</label><div id="fCC"></div></div>' +
-    (edit ? '<div class="field"><label>' + t('reason') + '</label><input id="fReason" maxlength="200"></div>' : '<div class="field"><label>' + t('billPhoto') + '</label><input id="fPhoto" type="file" accept="image/*" capture="environment"></div>') +
+    (edit ? '<div class="field"><label>' + t('reason') + '</label><input id="fReason" maxlength="200"></div>' : '<div class="field"><label>' + t('billPhoto') + '</label><div class="seg" id="fPhBtns"><button type="button" id="fCamBtn">📷 ' + t('takePhoto') + '</button><button type="button" id="fGalBtn">🖼️ ' + t('fromGallery') + '</button></div><input id="fCam" type="file" accept="image/*" capture="environment" class="hidden"><input id="fGal" type="file" accept="image/*" class="hidden"><div id="fPhPrev" class="row hidden" style="margin-top:8px;gap:10px;align-items:center"><img id="fPhImg" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--rule)"><span class="small grow">✓ ' + t('photoAdded') + '</span><button type="button" class="btn sec mini" id="fPhDel">✕</button></div></div>') +
     '<button class="btn huge" id="fSave">' + t('save') + '</button><div id="fMsg" class="small err" style="margin-top:8px"></div>');
-  var selCat = cat, selPay = payer;
+  var selCat = cat, selPay = payer, pickedFile = null;
+  if (!edit) {
+    var showPick = function (f) { pickedFile = f || null; $('fPhPrev').classList.toggle('hidden', !pickedFile); $('fPhBtns').classList.toggle('hidden', !!pickedFile); if (pickedFile) { try { $('fPhImg').src = URL.createObjectURL(pickedFile); } catch (er) { } } };
+    $('fCamBtn').onclick = function () { $('fCam').value = ''; $('fCam').click(); };
+    $('fGalBtn').onclick = function () { $('fGal').value = ''; $('fGal').click(); };
+    $('fCam').onchange = function () { showPick(this.files[0]); };
+    $('fGal').onchange = function () { showPick(this.files[0]); };
+    $('fPhDel').onclick = function () { $('fCam').value = ''; $('fGal').value = ''; showPick(null); };
+  }
   var picker = ccPicker($('fCC'), edit ? shares(e) : [['Household', 0]], function () { return Number($('fAmt').value) || 0; });
   $('fAmt').addEventListener('input', function () { picker.refresh(); });
   m.querySelectorAll('[data-cat]').forEach(function (b) { b.onclick = function () { selCat = b.dataset.cat; $('fCats').classList.remove('need'); if ($('fMsg').textContent === t('pickCat')) $('fMsg').textContent = ''; m.querySelectorAll('[data-cat]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
@@ -857,7 +866,7 @@ function expenseForm(e) {
       if (isDuplicate(ST.expenses, amt, selCat, date) && !(await confirmBox(t('dupAsk'), '✓'))) return;
       busy(btn, true);
       try {
-        var photo = null, file = $('fPhoto') && $('fPhoto').files[0];
+        var photo = null, file = pickedFile;
         if (file) { var blob = await compressImage(file), path = ST.hh.id + '/' + ST.user.id + '/' + Date.now() + '.jpg'; var up = await sb.storage.from('bill-photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false }); if (up.error) throw up.error; photo = path; }
         await rpc('add_expense', Object.assign({ p_household: ST.hh.id, p_category: selCat, p_amount: amt, p_note: $('fNote').value.trim(), p_date: date, p_has_bill: !!photo, p_photo_url: photo, p_paid_by: selPay }, splitArgs(cp.shares)));
       } catch (er) { busy(btn, false); var mm = $('fMsg'); if (mm) mm.textContent = dbMsg(er.message); else showErr(er); return; }
