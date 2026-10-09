@@ -1,1 +1,16 @@
-{"name":"Ghar Kharcha Online","short_name":"Ghar Kharcha","start_url":"./","display":"standalone","background_color":"#f3ecdc","theme_color":"#5c1b23","description":"Cloud household cash expense register"}
+{
+  "name": "Ghar Kharcha Online",
+  "short_name": "Ghar Kharcha",
+  "description": "Ek hisaab — sabke phone par",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ede2cb",
+  "theme_color": "#5c1b23",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
