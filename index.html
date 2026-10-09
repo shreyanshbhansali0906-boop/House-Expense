@@ -59,6 +59,9 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th,table.t td
 .todo .it{cursor:default}.kbd{font:12px ui-monospace,monospace;background:var(--paper2);padding:2px 6px;border-radius:4px}
 .hi-big{font-size:17px}.hi-big .it .tx b{font-size:17px}
 @media(max-width:520px){.grid2{grid-template-columns:1fr}.cash .big{font-size:40px}.brand h1{font-size:24px}}
+
+input.date-big{font-size:22px!important;font-weight:700;text-align:center;padding:12px!important;margin-top:8px;width:100%;border:2px solid var(--ink,#333)!important;border-radius:10px}
+
 </style>
 </head>
 <body>
@@ -364,7 +367,7 @@ function monthReport(st, m) {
   var tot = sumAmt(cur), ptot = sumAmt(prev), cats = catTotals(ex, m), pcats = catTotals(ex, prevMonth(m)), flags = [];
   Object.keys(cats).forEach(function (c) { var a = cats[c], b = pcats[c] || 0; if (b > 0 && a - b > 500 && a > b * 1.3) flags.push(catName(c) + ' up ' + Math.round((a / b - 1) * 100) + '% (₹' + money(b) + ' → ₹' + money(a) + ')'); });
   var unv = cur.filter(function (e) { return !e.verified_at; }).length; if (unv) flags.push(unv + ' entries not checked by Shrey');
-  var bl = balances(ex, st.settlements, (st.hh && st.hh.payers) || []); Object.keys(bl).forEach(function (p) { if (bl[p].bal < 0) flags.push('House owes ' + p + ' ₹' + money(-bl[p].bal)); else if (bl[p].bal > 0) flags.push(p + ' holds advance ₹' + money(bl[p].bal)); });
+  var bl = balances(ex, st.settlements, (st.hh && st.hh.payers) || []); Object.keys(bl).forEach(function (p) { if (bl[p].bal < 0) flags.push('House owes ' + pName(p) + ' ₹' + money(-bl[p].bal)); else if (bl[p].bal > 0) flags.push(pName(p) + ' holds advance ₹' + money(bl[p].bal)); });
   var corr = cur.filter(function (e) { return e.entry_kind === 'reversal'; }).length; if (corr) flags.push(corr + ' corrections of closed months');
   var rem = ex.filter(function (e) { return e.removed_at && ym(e.expense_date) === m; }).length; if (rem) flags.push(rem + ' entries removed');
   var added = (st.txs || []).filter(function (x) { return x.type === 'fund_add' && ym(x.transaction_date) === m; }).reduce(function (a, x) { return a + Number(x.amount); }, 0);
@@ -373,7 +376,66 @@ function monthReport(st, m) {
   return { m: m, total: tot, prevTotal: ptot, count: cur.length, cats: cats, cc: ccTotals(ex, m), flags: flags, added: added, loanRow: lrow, loanBalance: lb.balance };
 }
 
-if (typeof module !== 'undefined') module.exports = { dbMsg: dbMsg, noteTx: noteTx, balances: balances, owedTotal: owedTotal, advTotal: advTotal, loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
+
+/* ---------- Hindi for owner/admin screens (these were written in English) ---------- */
+var HI_DICT = {
+  'Fund': 'फंड', 'Really free': 'असल में खाली', 'Owed to people': 'लोगों का बकाया', 'Loan payable': 'देय लोन', '+ Expense': '+ खर्चा', '+ Top-up': '+ टॉप-अप',
+  'View as…': 'किसकी नज़र से देखें…', 'Back to mine': 'वापस मेरी स्क्रीन', 'Mamta': 'ममता', 'Shrey': 'श्रेय', 'Guest': 'मेहमान', 'Superuser': 'सुपरयूज़र', 'Supervisor': 'सुपरवाइज़र', 'House Manager': 'घर प्रबंधक', 'Pending': 'मंज़ूरी बाकी',
+  'At a glance': 'एक नज़र में', 'This month': 'इस महीने', 'Last month': 'पिछले महीने', 'Last 7 days': 'पिछले 7 दिन', 'Daily avg (30d)': 'रोज़ का औसत (30 दिन)', 'Runway': 'फंड कितने दिन चलेगा',
+  '1%/month, compounded monthly': '1%/महीना, हर महीने चक्रवृद्धि', 'Cash given': 'दिया गया कैश', 'Interest so far': 'अब तक ब्याज', 'Repaid': 'चुकाया', 'Payable today': 'आज देय', 'Payable today:': 'आज देय:',
+  'Month': 'महीना', 'Opening': 'शुरुआत', '+ Cash': '+ कैश', '+ Adjusted': '+ एडजस्ट', '+ Interest': '+ ब्याज', '− Repaid': '− चुकाया', 'Closing': 'अंत',
+  '* this month so far (interest added at month end)': '* इस महीने अब तक (ब्याज महीने के अंत में जुड़ता है)', 'Every loan entry': 'लोन की हर एंट्री',
+  '📄 Settlement statement': '📄 हिसाब का स्टेटमेंट', '📄 Passbook PDF': '📄 पासबुक PDF', 'All entries': 'सभी एंट्री', 'All months': 'सभी महीने', 'All categories': 'सभी श्रेणियाँ', 'All cost centres': 'सभी (किसके लिए)',
+  'Household': 'घर', 'Papa': 'पापा', 'Shreyansh': 'श्रेयांश', 'Shreya': 'श्रेया', 'Simba': 'सिंबा', 'Any status': 'कोई भी स्थिति', 'Open': 'खुला', 'Not checked': 'जाँच नहीं हुई', 'Checked': 'जाँचा गया', 'To pay back': 'लौटाना है', 'Locked': 'बंद', 'Removed': 'हटाई गई',
+  'Entries': 'एंट्री', 'Top-up': 'टॉप-अप', '⬇ Excel': '⬇ एक्सेल', '⚙ Cost centres': '⚙ किसके लिए (सूची)', 'Charts': 'चार्ट', 'All time': 'शुरू से अब तक', 'Category': 'श्रेणी', 'Cost centre': 'किसके लिए', 'By category': 'श्रेणी अनुसार', 'By cost centre': 'किसके लिए अनुसार',
+  'Month close': 'महीना बंद', 'closed months can only be corrected': 'बंद महीनों में सिर्फ़ सुधार हो सकता है', 'Report': 'रिपोर्ट', 'Close': 'बंद करें', 'Close month': 'महीना बंद करें', 'Month by month': 'महीनेवार', 'No past months yet.': 'अभी कोई पुराना महीना नहीं।',
+  'Money history': 'पैसे का इतिहास', 'Expense (fund)': 'खर्चा (फंड से)', 'Own-pocket expense': 'अपनी जेब से खर्चा', 'Paid back': 'लौटाया', 'Adjusted in top-up': 'टॉप-अप में एडजस्ट', 'Loan repaid': 'लोन चुकाया', 'Fund correction': 'फंड सुधार', 'Entry edited': 'एंट्री बदली', 'Entry removed': 'एंट्री हटाई', 'Correction': 'सुधार', 'Deleted (old app)': 'हटाई (पुराना ऐप)', 'Fund reduced (old)': 'फंड घटा (पुराना)', 'Reserve add (old)': 'रिज़र्व जुड़ा (पुराना)', 'Reserve reduced (old)': 'रिज़र्व घटा (पुराना)',
+  'Team': 'टीम', 'Remove…': 'हटाएँ…', 'Remove': 'हटाएँ', '🔑 Reset password': '🔑 पासवर्ड बदलें', 'Family code': 'परिवार कोड', 'Guest code': 'मेहमान कोड', '↻ New codes': '↻ नए कोड', 'Anyone who joins waits for your approval.': 'जो भी जुड़ेगा, आपकी मंज़ूरी का इंतज़ार करेगा।', 'Reject': 'मना करें',
+  'Settings': 'सेटिंग्स', 'HOUSEHOLD NAME': 'घर का नाम', 'MONTHLY STATEMENT EMAIL': 'मासिक स्टेटमेंट ईमेल', 'Save': 'सेव करें', '🔔 Low-fund alert': '🔔 फंड कम होने की सूचना', 'ALERT WHEN FUND BELOW ₹ (empty = off)': 'फंड इससे कम हो तो सूचना ₹ (खाली = बंद)',
+  'YOUR WHATSAPP NUMBER': 'आपका व्हाट्सऐप नंबर', 'CALLMEBOT API KEY': 'CALLMEBOT API की', 'Save alert': 'सूचना सेव करें', 'Send test': 'टेस्ट भेजें',
+  'One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message': 'एक बार व्हाट्सऐप सेटअप: callmebot.com पर दिया CallMeBot नंबर अपने कॉन्टैक्ट में सेव करें, उसे यह मैसेज भेजें',
+  ', and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.': ', और जवाब में आई API की यहाँ डालें। फंड सीमा से नीचे जाने पर एक व्हाट्सऐप + एक ईमेल आएगा; टॉप-अप के बाद फिर चालू हो जाता है।',
+  'Add new rate': 'नई दर जोड़ें', 'New rates apply from a date this month or later; past months never change.': 'नई दर इस महीने या आगे की तारीख से लगेगी; पुराने महीने कभी नहीं बदलते।',
+  'Backup': 'बैकअप', 'auto on 1st & 16th': '1 और 16 तारीख को अपने-आप', '⚠️ No backup yet': '⚠️ अभी कोई बैकअप नहीं', '💾 Backup now': '💾 अभी बैकअप लें', '💬 Suggestions': '💬 सुझाव', 'Export': 'डाउनलोड',
+  '⬇ Excel (everything)': '⬇ एक्सेल (सब कुछ)', '💾 JSON': '💾 JSON', 'Search…': 'खोजें…', 'e.g. 1234567': 'जैसे 1234567', '% / month': '% / महीना', 'Household name': 'घर का नाम',
+  'CASH GIVEN TO MUMMY ₹': 'मम्मी को दिया कैश ₹', 'SOURCE': 'कहाँ से', 'Shreyansh (loan, 1%/month)': 'श्रेयांश (लोन, 1%/महीना)', 'Business income (not a loan)': 'बिज़नेस की आमदनी (लोन नहीं)', 'NOTE': 'नोट',
+  'AMOUNT ₹': 'रकम ₹', 'FROM': 'कहाँ से', 'House cash (surplus) — Fund goes down': 'घर का बचा कैश — फंड घटेगा', 'Outside (business etc.) — Fund unchanged': 'बाहर से (बिज़नेस आदि) — फंड वही रहेगा', 'DATE': 'तारीख', 'CATEGORY': 'श्रेणी', 'EMAIL': 'ईमेल', 'PASSWORD': 'पासवर्ड',
+  'Use only to fix a mistake in the fund balance. Normal spending goes through expenses; repayments through Loan repayment.': 'सिर्फ़ फंड बैलेंस की गलती ठीक करने के लिए। आम खर्चा "खर्चा" से और लोन चुकाना "लोन वापसी" से करें।',
+  'CHANGE ₹ (use − to reduce)': 'बदलाव ₹ (घटाने के लिए − लगाएँ)', 'REASON (required)': 'कारण (ज़रूरी)', 'This fixes a wrongly entered top-up (also changes the loan)': 'यह गलत डाले गए टॉप-अप को ठीक करता है (लोन भी बदलेगा)',
+  'CORRECT AMOUNT ₹ (0 = cancel the entry)': 'सही रकम ₹ (0 = एंट्री रद्द)', 'Save correction': 'सुधार सेव करें', 'Original:': 'असली:', 'App:': 'ऐप:', '✓ Match': '✓ मिल गया',
+  'Spent': 'खर्चा', 'vs previous': 'पिछले से तुलना', 'Per person': 'हर व्यक्ति', 'Loan': 'लोन', 'Close the month to email the final statement.': 'फ़ाइनल स्टेटमेंट ईमेल करने के लिए महीना बंद करें।', 'No flags ✓': 'कोई चेतावनी नहीं ✓',
+  'Supervisor report': 'सुपरवाइज़र रिपोर्ट', '📧 Email this statement now': '📧 यह स्टेटमेंट अभी ईमेल करें', 'Refresh': 'ताज़ा करें', 'Logout': 'लॉगआउट', 'Loading…': 'लोड हो रहा है…',
+  'Saved': 'सेव हो गया', 'Rate saved': 'दर सेव हो गई', 'Approved': 'मंज़ूर', 'No entries': 'कोई एंट्री नहीं', 'Popup blocked — allow popups': 'पॉपअप रुका — पॉपअप की अनुमति दें', '💾 Backup done': '💾 बैकअप हो गया', '📧 Statement email sent': '📧 स्टेटमेंट ईमेल भेज दिया', '🔑 Password changed': '🔑 पासवर्ड बदल गया',
+  'Remove this person?': 'इस व्यक्ति को हटाएँ?', 'Make new family and guest codes? Old codes stop working.': 'नए परिवार और मेहमान कोड बनाएँ? पुराने कोड बंद हो जाएँगे।', 'Yes': 'हाँ', 'Cancel': 'रद्द करें', 'OK': 'ठीक है'
+};
+var HI_RX = [
+  [/^(\d+)% of last month by day (\d+)$/, 'दिन $2 तक पिछले महीने का $1%'], [/^(\d+) days?$/, '$1 दिन'], [/^Last month: /, 'पिछले महीने: '],
+  [/^Loan passbook — (.*)$/, 'लोन पासबुक — $1'], [/^Fund ₹([\d,.]+)( · limit ₹([\d,.]+))? · dues ₹([\d,.]+)$/, function (m, f, x, l, d) { return 'फंड ₹' + f + (l ? ' · सीमा ₹' + l : '') + ' · बकाया ₹' + d; }], [/^· Fund ₹/, '· फंड ₹'],
+  [/^Report — (.*)$/, 'रिपोर्ट — $1'], [/ up (\d+)% \(/, ' $1% बढ़ा ('], [/^(\d+) entries not checked by Shrey$/, '$1 एंट्री की जाँच श्रेय ने नहीं की'],
+  [/^House owes (.*) ₹(.*)$/, 'घर पर $1 का बकाया ₹$2'], [/^(.*) holds advance ₹(.*)$/, '$1 के पास एडवांस ₹$2'], [/^(\d+) corrections of closed months$/, 'बंद महीनों के $1 सुधार'], [/^(\d+) entries removed$/, '$1 एंट्री हटाई गईं'],
+  [/^\s*Opening ₹(.*) \+ cash ₹(.*) \+ interest ₹(.*) − repaid ₹(.*) =\s*$/, 'शुरुआत ₹$1 + कैश ₹$2 + ब्याज ₹$3 − चुकाया ₹$4 ='],
+  [/^Closing a month also closes all earlier open months\. The final statement is emailed to (.*)\.$/, 'महीना बंद करने पर उससे पहले के सभी खुले महीने भी बंद हो जाते हैं। फ़ाइनल स्टेटमेंट $1 पर ईमेल होता है।'],
+  [/^(Superuser|Supervisor|House Manager|Guest|Pending)( · .*)$/, function (m, r, rest) { return HI_DICT[r] + rest.replace(' · last login ', ' · आख़िरी लॉगिन '); }],
+  [/^👁 Preview: (.*) screen$/, function (m, r) { return '👁 झलक: ' + (HI_DICT[r] || r) + ' की स्क्रीन'; }],
+  [/^(.*) · (Superuser|Supervisor|House Manager|Guest)$/, function (m, n, r) { return n + ' · ' + HI_DICT[r]; }],
+  [/^🟢 Open · close manually$/, '🟢 खुला · हाथ से बंद करें'], [/^🟢 Open · auto-closes /, '🟢 खुला · अपने-आप बंद होगा '], [/^🔒 Closed /, '🔒 बंद '], [/ \(auto\)/, ' (अपने-आप)'], [/ · 📧 sent$/, ' · 📧 भेजा'],
+  [/ · cloud synced$/, ' · क्लाउड से जुड़ा'], [/(^|\s)· Fund ₹/, '$1· फंड ₹'],
+  [new RegExp(' · (' + Object.keys(CATS).map(function (k) { return CATS[k].en.replace(/[()&]/g, '\\$&'); }).join('|') + ')( —| |$)'), function (m, c, e) { for (var k in CATS) if (CATS[k].en === c) return ' · ' + CATS[k].hi + e; return m; }],
+  [/^Loan rate: /, 'लोन दर: '], [/(^|, |: )from (\d{4}-\d\d-\d\d): /g, '$1$2 से: '], [/ join request\(s\) waiting — see Team below\.$/, ' जुड़ने के अनुरोध बाकी — नीचे टीम देखें।'], [/ self-settlement\(s\) waiting for Shrey\.$/, ' खुद के भुगतान श्रेय की मंज़ूरी के लिए बाकी।'],
+  [/^(✅ |⚠️ )?Last backup (\d+) days ago$/, '$1आख़िरी बैकअप $2 दिन पहले'], [/^ADJUST WHAT THE HOUSE OWES SHREYANSH \(₹(.*)\) — added to loan, no cash moves$/, 'घर पर श्रेयांश का बकाया एडजस्ट करें (₹$1) — लोन में जुड़ेगा, कैश नहीं हिलेगा'],
+  [/^(.*) is closed\. The original stays as it is; a correction \(reverse \+ new entry\) is posted today, with your reason\.$/, '$1 बंद है। असली एंट्री वैसी ही रहेगी; आज आपके कारण के साथ सुधार (उल्टी + नई एंट्री) डाली जाएगी।'],
+  [/^Close (.*) \(and any earlier open months\)\? Entries can then only be corrected, never edited\.$/, '$1 (और पहले के खुले महीने) बंद करें? फिर एंट्री सिर्फ़ सुधारी जा सकेगी, बदली नहीं।'],
+  [/^(\d+) month\(s\) closed$/, '$1 महीने बंद हुए'], [/^📧 Sent to /, '📧 भेजा गया: '], [/^New codes: /, 'नए कोड: '], [/^Test sent: /, 'टेस्ट भेजा: '], [/^Error: /, 'गलती: '],
+  [/^Send this to (.*):$/, '$1 को यह भेजें:'], [/^New password for (.*) \(min 6 characters\):$/, '$1 का नया पासवर्ड (कम से कम 6 अक्षर):']
+];
+function hiText(s) {
+  if (LANG !== 'hi' || !s || !/[A-Za-z]/.test(s)) return s;
+  var tr = s.trim(); if (HI_DICT[tr]) return s.replace(tr, HI_DICT[tr]);
+  var o = s; for (var i = 0; i < HI_RX.length; i++) o = o.replace(HI_RX[i][0], HI_RX[i][1]);
+  return o;
+}
+
+if (typeof module !== 'undefined') module.exports = { hiText: hiText, dbMsg: dbMsg, noteTx: noteTx, balances: balances, owedTotal: owedTotal, advTotal: advTotal, loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
 </script>
 <script>/* ===== Ghar Kharcha v14 — app (screens + actions) ===== */
 var sb = null, sbPromise = null, chan = null, reloadTimer = null;
@@ -390,6 +452,7 @@ function showErr(e) { var m = (e && (e.message || e.error_description)) || Strin
 function guard(fn) { return function () { var a = arguments; try { var r = fn.apply(this, a); if (r && r.catch) r.catch(showErr); return r; } catch (e) { showErr(e); } }; }
 function openModal(html, onClose) { closeModal(); var m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.innerHTML = '<div class="sheet"' + (zoomVal() !== 1 ? ' style="zoom:' + zoomVal() + ';max-height:' + (94 / zoomVal()).toFixed(1) + 'vh"' : '') + '>' + html + '</div>'; m.addEventListener('click', function (e) { if (e.target === m) closeModal(); }); document.body.appendChild(m); ST._onClose = onClose || null; return m; }
 function closeModal() { var m = $('modal'); if (m) m.remove(); if (ST._onClose) { var f = ST._onClose; ST._onClose = null; f(); } }
+function longDate(s) { if (!s) return ''; return new Date(s + 'T00:00:00').toLocaleDateString(LANG === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
 function sheetHead(title) { return '<h3><span>' + title + '</span><button class="btn sec mini" data-a="closeModal">✕</button></h3>'; }
 function confirmBox(text, okLbl) { return new Promise(function (res) { openModal(sheetHead('') + '<p style="font-size:18px">' + esc(text) + '</p><div class="actions"><button class="btn" id="cfY">' + esc(okLbl || 'OK') + '</button><button class="btn sec" id="cfN">' + t('cancel') + '</button></div>', function () { res(false); }); $('cfY').onclick = function () { ST._onClose = null; closeModal(); res(true); }; $('cfN').onclick = function () { closeModal(); }; }); }
 function busy(btn, on) { if (!btn) return; btn.disabled = on; if (on) { btn.dataset.t = btn.textContent; btn.textContent = '…'; } else if (btn.dataset.t) btn.textContent = btn.dataset.t; }
@@ -486,6 +549,20 @@ document.addEventListener('visibilitychange', function () { if (document.visibil
 window.addEventListener('pageshow', function (e) { if (e.persisted && ST.user) refresh(); });
 setInterval(function () { if (document.visibilityState === 'visible' && ST.user && ST.role && ST.role !== 'pending' && !$('modal') && Date.now() - lastRefresh > 120000) refresh(); }, 30000);
 /* ---------- render ---------- */
+/* Hindi: translate the English-only owner/admin labels as they appear */
+function hiWalk(root) {
+  if (LANG !== 'hi' || !root) return;
+  if (root.nodeType === 3) { var p = root.parentNode; if (p && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName)) { var v = hiText(root.nodeValue); if (v !== root.nodeValue) root.nodeValue = v; } return; }
+  if (root.nodeType !== 1) return;
+  if (root.placeholder) { var ph = hiText(root.placeholder); if (ph !== root.placeholder) root.placeholder = ph; }
+  var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT), n;
+  while ((n = w.nextNode())) {
+    if (n.nodeType === 3) { if (!/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) { var x = hiText(n.nodeValue); if (x !== n.nodeValue) n.nodeValue = x; } }
+    else if (n.placeholder) { var y = hiText(n.placeholder); if (y !== n.placeholder) n.placeholder = y; }
+  }
+}
+try { new MutationObserver(function (ms) { if (LANG !== 'hi') return; ms.forEach(function (m) { m.addedNodes.forEach(hiWalk); }); }).observe(document.body, { childList: true, subtree: true }); } catch (e) { }
+
 function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) eb.textContent = t('eyebrow');
   var app = $('app'); if (!app) return;
   var v;
@@ -497,6 +574,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function header(extra) {
@@ -742,13 +820,12 @@ function expenseForm(e) {
   var edit = !!e, cat = edit ? e.category : 'GR', payer = edit ? e.paid_by : 'fund', locked = edit && !!e.settlement_id;
   var payOpts = [['fund', t('houseFund')]].concat(payers().map(function (p) { return [p, pName(p) + (p === 'Mamta' && R() === 'member' ? ' (' + (LANG === 'hi' ? 'मेरी जेब' : 'my pocket') + ')' : ' · ' + t('ownPocket'))]; }));
   var m = openModal(sheetHead(edit ? t('edit') : t('addExpense').replace('+ ', '')) +
-    (edit ? '' : '<div class="field"><div class="row"><input id="qkTxt" class="grow" placeholder="' + esc(t('quick')) + '" style="padding:11px;border:1px solid var(--rule);border-radius:8px;font-size:16px"><button class="btn sec" id="qkBtn">' + t('fill') + '</button></div></div>') +
     '<div class="field"><label>' + t('amount') + '</label><input id="fAmt" class="amount-big" type="number" inputmode="decimal" min="0" step="0.01" value="' + (edit ? Number(e.amount) : '') + '"' + (locked ? ' disabled' : '') + '></div>' +
+    '<div class="field"><label>' + t('note') + '</label><input id="fNote" maxlength="200" value="' + esc(edit ? e.note : '') + '"></div>' +
+    '<div class="field"><label>' + t('date') + '</label><input id="fDate" class="date-big" type="date" max="' + today() + '" value="' + (edit ? e.expense_date : today()) + '"><div id="fDateShow" class="small muted" style="text-align:center;margin-top:3px">' + longDate(edit ? e.expense_date : today()) + '</div></div>' +
     '<div class="field"><label>' + t('category') + '</label><div class="cats" id="fCats">' + Object.keys(CATS).map(function (c) { return '<button type="button" class="cat ' + (c === cat ? 'on' : '') + '" data-cat="' + c + '"><span class="e">' + catIcon(c) + '</span>' + esc(catName(c)) + '</button>'; }).join('') + '</div></div>' +
     '<div class="field"><label>' + t('whoPaid') + '</label><div class="seg" id="fPay">' + payOpts.map(function (o) { return '<button type="button" class="' + (o[0] === payer ? 'on' : '') + '" data-p="' + esc(o[0]) + '"' + (locked ? ' disabled' : '') + '>' + esc(o[1]) + '</button>'; }).join('') + '</div></div>' +
     '<div class="field"><label>' + t('forWhom') + '</label><div id="fCC"></div></div>' +
-    '<div class="field"><label>' + t('note') + '</label><input id="fNote" maxlength="200" value="' + esc(edit ? e.note : '') + '"></div>' +
-    '<div class="field"><span id="fDateLbl" class="small muted">' + t('date') + ': <b id="fDateShow">' + prettyDate(edit ? e.expense_date : today()) + '</b> · <a href="#" id="fDateTog">' + t('changeDate') + '</a></span><input id="fDate" type="date" max="' + today() + '" value="' + (edit ? e.expense_date : today()) + '" class="hidden" style="margin-top:6px"></div>' +
     (edit ? '<div class="field"><label>' + t('reason') + '</label><input id="fReason" maxlength="200"></div>' : '<div class="field"><label>' + t('billPhoto') + '</label><input id="fPhoto" type="file" accept="image/*" capture="environment"></div>') +
     '<button class="btn huge" id="fSave">' + t('save') + '</button><div id="fMsg" class="small err" style="margin-top:8px"></div>');
   var selCat = cat, selPay = payer;
@@ -756,13 +833,9 @@ function expenseForm(e) {
   $('fAmt').addEventListener('input', function () { picker.refresh(); });
   m.querySelectorAll('[data-cat]').forEach(function (b) { b.onclick = function () { selCat = b.dataset.cat; m.querySelectorAll('[data-cat]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
   m.querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { selPay = b.dataset.p; m.querySelectorAll('[data-p]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
-  $('fDateTog').onclick = function (ev) { ev.preventDefault(); $('fDate').classList.toggle('hidden'); };
-  $('fDate').onchange = function () { $('fDateShow').textContent = prettyDate($('fDate').value); };
-  if (!edit) $('qkBtn').onclick = function () {
-    var p = parseQuick($('qkTxt').value); if (p.amount) $('fAmt').value = p.amount; selCat = p.cat;
-    m.querySelectorAll('[data-cat]').forEach(function (x) { x.classList.toggle('on', x.dataset.cat === selCat); });
-    var who = p.who.filter(function (w) { return ccList().indexOf(w) >= 0; }); picker.set(who.length ? who : ['Household']); if (p.note) $('fNote').value = p.note;
-  };
+  function syncDate() { $('fDateShow').textContent = longDate($('fDate').value); }
+  $('fDate').onchange = syncDate; $('fDate').oninput = syncDate;
+
   $('fSave').onclick = guard(async function () {
     var amt = Number($('fAmt').value), date = $('fDate').value || today(), btn = $('fSave');
     if (!(amt > 0)) { $('fMsg').textContent = t('amountBad'); return; }
@@ -991,7 +1064,7 @@ var A = {
   sugDel: async function (el) { await rpc('delete_suggestion', { p_id: el.dataset.id }); await refresh(); },
   approveMember: async function (el) { await rpc('set_member_role', { p_household: ST.hh.id, p_user: el.dataset.u, p_role: el.dataset.r }); toast('Approved'); await refresh(); },
   setRole: async function (el) { if (el.dataset.r === 'remove' && !(await confirmBox('Remove this person?', 'Remove'))) return; await rpc('set_member_role', { p_household: ST.hh.id, p_user: el.dataset.u, p_role: el.dataset.r }); await refresh(); },
-  resetPw: async function (el) { var pw = prompt('New password for ' + el.dataset.n + ' (min 6 characters):', 'Ghar@' + Math.floor(1000 + Math.random() * 9000)); if (!pw) return; await rpc('admin_set_password', { p_household: ST.hh.id, p_user: el.dataset.u, p_password: pw }); openModal(sheetHead('🔑 Password changed') + '<p>Send this to ' + esc(el.dataset.n) + ':</p><p class="kbd" style="font-size:20px">' + esc(pw) + '</p><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(t('newPwMsg', { p: pw, u: location.origin })) + '">📤 WhatsApp</a>'); },
+  resetPw: async function (el) { var pw = prompt(hiText('New password for ' + el.dataset.n + ' (min 6 characters):'), 'Ghar@' + Math.floor(1000 + Math.random() * 9000)); if (!pw) return; await rpc('admin_set_password', { p_household: ST.hh.id, p_user: el.dataset.u, p_password: pw }); openModal(sheetHead('🔑 Password changed') + '<p>Send this to ' + esc(el.dataset.n) + ':</p><p class="kbd" style="font-size:20px">' + esc(pw) + '</p><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(t('newPwMsg', { p: pw, u: location.origin })) + '">📤 WhatsApp</a>'); },
   regen: async function () { if (!(await confirmBox('Make new family and guest codes? Old codes stop working.', 'Yes'))) return; var r = await rpc('regen_codes', { p_household: ST.hh.id }); toast('New codes: ' + r.join_code + ' / ' + r.guest_code); await refresh(); },
   saveSettings: async function () { await rpc('update_household', { p_household: ST.hh.id, p_name: $('setName').value.trim(), p_report_email: $('setEmail').value.trim() }); toast('Saved'); await refresh(); },
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
