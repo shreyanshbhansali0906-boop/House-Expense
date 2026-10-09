@@ -154,9 +154,73 @@ var T = {
   cashWithPeople: { en: 'Advance with people', hg: 'Logon ke paas advance', hi: 'लोगों के पास एडवांस' },
   lowFund: { en: 'Fund ₹{f} is below the limit ₹{l}', hg: 'Fund ₹{f} — limit ₹{l} se kam', hi: 'फंड ₹{f} — सीमा ₹{l} से कम' },
   tellBhaiya: { en: '📤 Tell Shreyansh', hg: '📤 Bhaiya ko batao', hi: '📤 भैया को बताओ' },
+  eyebrow: { en: 'Household accounts', hg: 'Ghar ka hisaab', hi: 'घर का हिसाब' },
+  loanRepay: { en: 'Loan repayment', hg: 'Loan wapsi', hi: 'लोन वापसी' }, fundFix: { en: 'Fund correction', hg: 'Galti sudhaar', hi: 'फंड सुधार' },
+  old7: { en: 'some are 7+ days old', hg: '7+ din purani bhi hain', hi: 'कुछ 7+ दिन पुराने हैं' },
+  lastDiff: { en: 'Last cash count differed by ₹{a}', hg: 'Last ginti mein farak: ₹{a}', hi: 'पिछली गिनती में फ़र्क: ₹{a}' },
+  waLow: { en: '🏠 Ghar Kharcha: fund ₹{f} is below the limit ₹{l}. Owed to people ₹{d}. Please send money.', hg: '🏠 Ghar Kharcha: fund ₹{f} (limit ₹{l} se kam). Dena baaki ₹{d}. Kripya paisa bhejein.', hi: '🏠 घर खर्चा: फंड ₹{f} (सीमा ₹{l} से कम)। देना बाकी ₹{d}। कृपया पैसे भेजें।' },
+  rpTitle: { en: 'Supervisor report', hg: 'Supervisor report', hi: 'सुपरवाइज़र रिपोर्ट' }, rpSpend: { en: 'Spent', hg: 'Kharcha', hi: 'खर्चा' },
+  rpCounted: { en: 'Cash counted', hg: 'Cash gina', hi: 'कैश गिना' }, rpDiff: { en: 'difference', hg: 'farak', hi: 'फ़र्क' },
+  rpNoCount: { en: 'Cash count: not done yet', hg: 'Cash ginti: abhi nahi hui', hi: 'कैश गिनती: अभी नहीं हुई' },
+  rpPeople: { en: 'People', hg: 'Log', hi: 'लोग' }, rpSelf: { en: 'Self-payments awaiting approval', hg: 'Self-settlement baaki', hi: 'मंज़ूरी बाकी' },
+  rpUnchecked: { en: 'Entries not yet checked', hg: 'Check baaki entries', hi: 'जाँच बाकी खर्चे' }, rpLimit: { en: 'Fund limit', hg: 'Fund limit', hi: 'फंड सीमा' },
+  newPwMsg: { en: 'New password for the Ghar Kharcha app: {p}\nLink: {u}', hg: 'Ghar Kharcha app ka naya password: {p}\nLink: {u}', hi: 'घर खर्चा ऐप का नया पासवर्ड: {p}\nलिंक: {u}' },
   textSize: { en: 'Text', hg: 'Akshar', hi: 'अक्षर' },
   correct: { en: 'Correction', hg: 'Sudhaar', hi: 'सुधार' }
 };
+var DBMSG = [
+  [/^Aage ki tareekh nahi chalegi$/, 'Future dates are not allowed', 'आगे की तारीख नहीं चलेगी'],
+  [/^Adjust ki kuch entries galat hain$/, 'Some entries to adjust are not valid', 'एडजस्ट की कुछ एंट्री गलत हैं'],
+  [/^Adjust sirf Shreyansh ke top-up mein$/, 'Adjusting is only allowed in a top-up from Shreyansh', 'एडजस्ट सिर्फ़ श्रेयांश के टॉप-अप में'],
+  [/^Amount (daalo|galat hai|sahi daalo)$/, 'Enter a valid amount', 'सही रकम डालें'],
+  [/^App ka naya version load karein.*$/, 'Please refresh the page to load the new version', 'नया वर्ज़न लाने के लिए पेज रिफ़्रेश करें'],
+  [/^(Badalne|Hatane|Sudhaar) ka kaaran likhna zaroori hai$|^Kaaran likhna zaroori hai$/, 'A reason is required', 'कारण लिखना ज़रूरी है'],
+  [/^Category galat hai$/, 'Invalid category', 'गलत श्रेणी'],
+  [/^Chalu mahina band nahi ho sakta$/, 'The current month cannot be closed', 'चालू महीना बंद नहीं हो सकता'],
+  [/^Chukaayi hui entry hataayi nahi ja sakti$/, 'A paid-back entry cannot be removed', 'चुकाई हुई एंट्री हटाई नहीं जा सकती'],
+  [/^Code galat hai$/, 'Wrong code', 'कोड गलत है'],
+  [/^Cost centre "(.*)" list mein nahi hai$/, 'Cost centre "$1" is not in the list', '"$1" सूची में नहीं है'],
+  [/^Email galat hai$/, 'Invalid email', 'ईमेल गलत है'],
+  [/^Entries hataayi nahi jaati.*$/, 'Entries are never deleted, only marked "removed"', 'एंट्री मिटाई नहीं जाती, सिर्फ़ "हटाई गई" होती है'],
+  [/^(Entry nahi mili|Nahi mila)$/, 'Not found', 'नहीं मिला'],
+  [/^Fund mein paisa kam hai(?: \(₹(.*)\))?$/, 'Not enough money in the fund', 'फंड में पैसे कम हैं'],
+  [/^Ginti galat hai$/, 'Invalid count', 'गिनती गलत है'],
+  [/^Is entry ka sudhaar nahi ho sakta$/, 'This entry cannot be corrected', 'इस एंट्री का सुधार नहीं हो सकता'],
+  [/^Is member ko nahi badal sakte$/, 'This member cannot be changed', 'इस सदस्य को नहीं बदल सकते'],
+  [/^Iska sudhaar pehle ho chuka.*$/, 'Already corrected — edit the new correction entry instead', 'इसका सुधार पहले हो चुका है'],
+  [/^Koi entry nahi chuni$/, 'No entry selected', 'कोई एंट्री नहीं चुनी'],
+  [/^Kuch entries galat hain ya pehle hi chukaayi ja chuki$/, 'Some entries are invalid or already paid back', 'कुछ एंट्री गलत हैं या पहले ही चुकाई जा चुकी हैं'],
+  [/^Limit galat hai$/, 'Invalid limit', 'सीमा गलत है'],
+  [/^List khali hai$/, 'The list is empty', 'सूची खाली है'],
+  [/^Mahina (.*) band ho chuka hai.*$/, 'Month $1 is closed — add a correction instead', '$1 का महीना बंद हो चुका है — सुधार एंट्री करें'],
+  [/^Mahina band ho chuka hai.*$/, 'This month is closed — add a correction instead', 'महीना बंद हो चुका है — सुधार एंट्री करें'],
+  [/^Mahina galat hai$/, 'Invalid month', 'महीना गलत है'],
+  [/^Mahina khula hai.*$/, 'This month is still open — edit the entry directly', 'महीना खुला है — एंट्री सीधे बदलें'],
+  [/^Naam chhota hai$/, 'Name is too short', 'नाम छोटा है'],
+  [/^Password kam se kam 6 akshar ka ho$/, 'Password must be at least 6 characters', 'पासवर्ड कम से कम 6 अक्षर का हो'],
+  [/^Payer galat hai$/, 'Invalid payer', 'पैसे देने वाला गलत है'],
+  [/^Pehle ye due chukaayein.*$/, 'Pay this back first, then correct it', 'पहले चुकाएँ, फिर सुधार करें'],
+  [/^Permission nahi hai$/, 'You do not have permission for this', 'आपको इसकी अनुमति नहीं है'],
+  [/^Purane mahino ka rate nahi badal sakte.*$/, 'Rates of past months cannot change — start the new rate this month or later', 'पुराने महीनों का रेट नहीं बदल सकता'],
+  [/^Rate (list )?galat hai$/, 'Invalid rate', 'रेट गलत है'],
+  [/^Reserve band kar diya gaya hai$/, 'Reserve has been switched off', 'रिज़र्व बंद है'],
+  [/^Source galat hai$/, 'Invalid source', 'स्रोत गलत है'],
+  [/^Split galat hai$/, 'Invalid split', 'बँटवारा गलत है'],
+  [/^Split ka total \((.*)\) amount \((.*)\) se match nahi karta$/, 'Split total ($1) does not match the amount ($2)', 'बँटवारे का जोड़ ($1) रकम ($2) से नहीं मिलता'],
+  [/^Sudhaar entry (badal|hataayi) nahi (sakte|ja sakti)$/, 'A correction entry cannot be changed', 'सुधार एंट्री नहीं बदली जा सकती'],
+  [/^Tareekh galat hai$/, 'Invalid date', 'तारीख गलत है'],
+  [/^WhatsApp number galat hai.*$/, 'Invalid WhatsApp number (e.g. +919876543210)', 'व्हाट्सऐप नंबर गलत है'],
+  [/^Ye due chukaaya ja chuka hai.*$/, 'Already paid back — amount/payer cannot change', 'चुकाया जा चुका है'],
+  [/^Ye entry ab aap nahi badal sakti.*$/, 'You can no longer edit this entry (3 days passed or already checked)', 'यह एंट्री अब आप नहीं बदल सकतीं (3 दिन बीत गए या जाँच हो चुकी)'],
+  [/^Ye entry hataayi ja chuki hai$/, 'This entry has been removed', 'यह एंट्री हटाई जा चुकी है'],
+  [/^Ye is ghar ka member nahi hai$/, 'Not a member of this household', 'इस घर का सदस्य नहीं है'],
+  [/^Ye naam list mein nahi hai$/, 'This name is not in the list', 'यह नाम सूची में नहीं है'],
+  [/^Galat (role|bhasha)$/, 'Invalid value', 'गलत मान']
+];
+function dbMsg(m) { m = String(m || ''); if (LANG === 'hg') return m; for (var i = 0; i < DBMSG.length; i++) { var r = DBMSG[i]; if (r[0].test(m)) return m.replace(r[0], LANG === 'hi' ? r[2] : r[1]); } return m; }
+var NOTEMAP = [[/^Diya: /, 'Given to ', 'दिए: '], [/^Wapas mila: /, 'Returned by ', 'वापस मिले: '], [/^Chukaaya: /, 'Paid back: ', 'चुकाया: '], [/^Top-up mein adjust/, 'Adjusted in top-up', 'टॉप-अप में एडजस्ट'],
+  [/^Entry badli: /, 'Entry edited: ', 'एंट्री बदली: '], [/^Hataayi: /, 'Removed: ', 'हटाई: '], [/entry hataayi gayi/i, 'entry removed', 'एंट्री हटाई गई'], [/^Sudhaar: /, 'Correction: ', 'सुधार: '], [/^↩ Sudhaar \(/, '↩ Correction (', '↩ सुधार ('], [/^Purane app se hataayi$/, 'Removed in the old app', 'पुराने ऐप से हटाई']];
+function noteTx(m) { m = String(m || ''); if (LANG === 'hg') return m; for (var i = 0; i < NOTEMAP.length; i++) if (NOTEMAP[i][0].test(m)) return m.replace(NOTEMAP[i][0], LANG === 'hi' ? NOTEMAP[i][2] : NOTEMAP[i][1]); return m; }
 function t(k, v) { var o = T[k]; var s = o ? (o[LANG] || o.hg || o.en) : k; if (v) Object.keys(v).forEach(function (x) { s = s.split('{' + x + '}').join(v[x]); }); return s; }
 function catName(c) { var o = CATS[c]; return o ? (o[LANG] || o.en) : c; }
 function catIcon(c) { return (CATS[c] || {}).ic || '📦'; }
@@ -309,7 +373,7 @@ function monthReport(st, m) {
   return { m: m, total: tot, prevTotal: ptot, count: cur.length, cats: cats, cc: ccTotals(ex, m), flags: flags, added: added, loanRow: lrow, loanBalance: lb.balance };
 }
 
-if (typeof module !== 'undefined') module.exports = { balances: balances, owedTotal: owedTotal, advTotal: advTotal, loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
+if (typeof module !== 'undefined') module.exports = { dbMsg: dbMsg, noteTx: noteTx, balances: balances, owedTotal: owedTotal, advTotal: advTotal, loanBook: loanBook, parseQuick: parseQuick, shares: shares, isPending: isPending, duesBy: duesBy, canEdit: canEdit, canCorrect: canCorrect, nextCashInfo: nextCashInfo, monthReport: monthReport, addDays: addDays, setLang: function (l) { LANG = l; } };
 </script>
 <script>/* ===== Ghar Kharcha v14 — app (screens + actions) ===== */
 var sb = null, sbPromise = null, chan = null, reloadTimer = null;
@@ -322,7 +386,7 @@ function R() { return ST.role; }   // real role for permissions
 
 /* ---------- small UI helpers ---------- */
 function toast(msg, isErr) { var d = document.createElement('div'); d.className = 'toast' + (isErr ? ' err' : ''); d.textContent = msg; document.body.appendChild(d); setTimeout(function () { d.remove(); }, isErr ? 5200 : 2600); }
-function showErr(e) { var m = (e && (e.message || e.error_description)) || String(e); console.error(e); toast(m, true); }
+function showErr(e) { var m = (e && (e.message || e.error_description)) || String(e); console.error(e); toast(dbMsg(m), true); }
 function guard(fn) { return function () { var a = arguments; try { var r = fn.apply(this, a); if (r && r.catch) r.catch(showErr); return r; } catch (e) { showErr(e); } }; }
 function openModal(html, onClose) { closeModal(); var m = document.createElement('div'); m.className = 'modal'; m.id = 'modal'; m.innerHTML = '<div class="sheet"' + (zoomVal() !== 1 ? ' style="zoom:' + zoomVal() + ';max-height:' + (94 / zoomVal()).toFixed(1) + 'vh"' : '') + '>' + html + '</div>'; m.addEventListener('click', function (e) { if (e.target === m) closeModal(); }); document.body.appendChild(m); ST._onClose = onClose || null; return m; }
 function closeModal() { var m = $('modal'); if (m) m.remove(); if (ST._onClose) { var f = ST._onClose; ST._onClose = null; f(); } }
@@ -339,7 +403,7 @@ function getSb() {
     if (!(window.supabase && window.supabase.createClient)) {
       var urls = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'], last = '';
       for (var i = 0; i < urls.length && !(window.supabase && window.supabase.createClient); i++) { try { await loadScript(urls[i]); } catch (e) { last = e.message; } }
-      if (!(window.supabase && window.supabase.createClient)) throw new Error('Internet / server se connect nahi ho paya (' + last + '). Net check karke Refresh karein.');
+      if (!(window.supabase && window.supabase.createClient)) throw new Error('Could not connect to the internet/server (' + last + '). Check the net and tap Refresh. · इंटरनेट से नहीं जुड़ पाया, नेट देखकर Refresh करें।');
     }
     sb = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true } });   // default key keeps people logged in from the old version
     return sb;
@@ -422,7 +486,7 @@ document.addEventListener('visibilitychange', function () { if (document.visibil
 window.addEventListener('pageshow', function (e) { if (e.persisted && ST.user) refresh(); });
 setInterval(function () { if (document.visibilityState === 'visible' && ST.user && ST.role && ST.role !== 'pending' && !$('modal') && Date.now() - lastRefresh > 120000) refresh(); }, 30000);
 /* ---------- render ---------- */
-function render() {
+function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) eb.textContent = t('eyebrow');
   var app = $('app'); if (!app) return;
   var v;
   if (ST.fatal && !ST.user) v = '<div class="card"><h2>⚠️</h2><p>' + esc(ST.fatal) + '</p><button class="btn" data-a="reload">Refresh</button></div>';
@@ -448,15 +512,8 @@ function cashCard(big) {
 function lowCashBanner() {
   var thr = ST.hh && ST.hh.low_fund_threshold; if (thr == null || role() === 'guest') return '';
   var f = fund(); if (f >= Number(thr)) return '';
-  var msg = '🏠 Ghar Kharcha: fund ₹' + money(f) + ' (limit ₹' + money(thr) + ' se kam). Dena baaki ₹' + money(dues()) + '. Kripya paisa bhejein.';
+  var msg = t('waLow', { f: money(f), l: money(thr), d: money(dues()) });
   return '<div class="banner red">⚠️ ' + t('lowFund', { f: money(f), l: money(thr) }) + (R() !== 'owner' ? '<div style="margin-top:6px"><a class="btn mini sec" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(msg) + '">' + t('tellBhaiya') + '</a></div>' : '') + '</div>';
-}
-function nextCashBanner(withBtn) {
-  var n = nextCashInfo(ST.expenses, ST.txs, fund(), dues()); if (!n.last) return '';
-  if (n.daysToDue > 2) return '<div class="banner blue">📅 ' + t('nextCash', { d: prettyDate(n.due) }) + '</div>';
-  var wa = encodeURIComponent('🏠 ' + ST.hh.name + ': agla ghar ka paisa ' + prettyDate(n.due) + ' ko due hai. Pichhle 15 din kharcha ₹' + money(n.spend15) + ', dena baaki ₹' + money(n.dues) + ', abhi fund ₹' + money(fund()) + '. Suggested top-up: ₹' + money(n.suggested));
-  return '<div class="banner org">📅 ' + t('nextCash', { d: prettyDate(n.due) }) + ' — ' + t('suggested', { a: money(n.suggested) }) + '<div class="small" style="font-weight:normal;margin-top:4px">15 din kharcha ₹' + money(n.spend15) + ' + dues ₹' + money(n.dues) + ' − fund ₹' + money(fund()) + '</div>' +
-    (withBtn ? '<div class="row" style="margin-top:6px"><a class="btn mini sec" target="_blank" href="https://wa.me/?text=' + wa + '">📤 WhatsApp</a>' + (R() !== 'member' ? '<button class="btn mini" data-a="topup">' + t('addTopup') + '</button>' : '') + '</div>' : '') + '</div>';
 }
 
 /* --- entries list --- */
@@ -467,7 +524,7 @@ function entryRow(e) {
   if (e.entry_kind === 'reversal' || e.entry_kind === 'replacement') chips += '<span class="chip">↩ ' + t('correct') + '</span>';
   if (e.edit_count) chips += '<span class="chip">✏️×' + e.edit_count + '</span>';
   if (e.photo_url) chips += '<span class="chip">📷</span>';
-  return '<div class="it ' + (live(e) ? '' : 'removed') + '" data-a="detail" data-id="' + e.id + '"><div class="ic">' + catIcon(e.category) + '</div><div class="tx"><b>' + esc(e.note || catName(e.category)) + '</b><small>' + catName(e.category) + ' · ' + esc(ccLabel(e)) + ' · ' + prettyDate(e.expense_date) + '</small><div>' + chips + '</div></div><div class="am">₹' + money(e.amount) + '</div></div>';
+  return '<div class="it ' + (live(e) ? '' : 'removed') + '" data-a="detail" data-id="' + e.id + '"><div class="ic">' + catIcon(e.category) + '</div><div class="tx"><b>' + esc(noteTx(e.note) || catName(e.category)) + '</b><small>' + catName(e.category) + ' · ' + esc(ccLabel(e)) + ' · ' + prettyDate(e.expense_date) + '</small><div>' + chips + '</div></div><div class="am">₹' + money(e.amount) + '</div></div>';
 }
 function listWithMore(key, rows, rowFn, n) { n = n || 10; var all = ST.more[key]; var h = rows.slice(0, all ? 3000 : n).map(rowFn).join(''); if (rows.length > n) h += '<div style="text-align:center;margin-top:8px"><button class="btn sec mini" data-a="more" data-k="' + key + '">' + (all ? t('less') : t('more') + ' (' + (rows.length - n) + ')') + '</button></div>'; return h || '<div class="muted">—</div>'; }
 function recentCard(title) {
@@ -492,16 +549,16 @@ function monthSummaryCard() {
 /* ---------- screens ---------- */
 function viewLogin() {
   var L = ST.authTab;
-  return '<div class="card"><div class="actions" style="margin-bottom:12px"><button class="btn ' + (L === 'login' ? '' : 'sec') + '" data-a="authTab" data-v="login">Login / लॉगिन</button><button class="btn ' + (L === 'signup' ? '' : 'sec') + '" data-a="authTab" data-v="signup">Naya account / नया खाता</button></div>' +
-    (L === 'signup' ? '<div class="field"><label>NAAM / नाम</label><input id="suName" autocomplete="name"></div>' : '') +
+  return '<div class="card"><div class="actions" style="margin-bottom:12px"><button class="btn ' + (L === 'login' ? '' : 'sec') + '" data-a="authTab" data-v="login">Login / लॉगिन</button><button class="btn ' + (L === 'signup' ? '' : 'sec') + '" data-a="authTab" data-v="signup">New account / नया खाता</button></div>' +
+    (L === 'signup' ? '<div class="field"><label>NAME / नाम</label><input id="suName" autocomplete="name"></div>' : '') +
     '<div class="field"><label>EMAIL</label><input id="auEmail" type="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" value="' + esc(lsGet('gk14-email') || '') + '"></div>' +
     '<div class="field"><label>PASSWORD</label><input id="auPass" type="password" autocomplete="' + (L === 'signup' ? 'new-password' : 'current-password') + '"></div>' +
-    '<button class="btn huge" data-a="' + (L === 'signup' ? 'signup' : 'login') + '">' + (L === 'signup' ? 'Account banao / खाता बनाओ' : 'Login / लॉगिन') + '</button>' +
-    '<p class="small muted" style="margin-top:10px">Password bhool gaye? Shreyansh se reset karwayein. · पासवर्ड भूल गए? श्रेयांश से रीसेट करवाएँ।</p><div id="authMsg" class="small err"></div></div>';
+    '<button class="btn huge" data-a="' + (L === 'signup' ? 'signup' : 'login') + '">' + (L === 'signup' ? 'Create account / खाता बनाओ' : 'Login / लॉगिन') + '</button>' +
+    '<p class="small muted" style="margin-top:10px">Forgot password? Ask Shreyansh to reset it. · पासवर्ड भूल गए? श्रेयांश से रीसेट करवाएँ।</p><div id="authMsg" class="small err"></div></div>';
 }
 function viewNoHouse() {
-  return '<div class="card"><h2>Ghar se judo / घर से जुड़ें</h2><div class="field"><label>CODE (Shreyansh se lein)</label><input id="joinCode" autocapitalize="characters" style="text-transform:uppercase;font-size:22px;letter-spacing:3px;text-align:center"></div><button class="btn huge" data-a="join">Judo / जुड़ें</button>' +
-    '<details style="margin-top:14px"><summary class="muted small">Naya ghar banana hai? (sirf pehli baar)</summary><div class="field" style="margin-top:8px"><input id="houseName" placeholder="Ghar ka naam"></div><button class="btn sec" data-a="createHouse">Ghar banao</button></details>' +
+  return '<div class="card"><h2>Join your household / घर से जुड़ें</h2><div class="field"><label>CODE (from Shreyansh / श्रेयांश से लें)</label><input id="joinCode" autocapitalize="characters" style="text-transform:uppercase;font-size:22px;letter-spacing:3px;text-align:center"></div><button class="btn huge" data-a="join">Join / जुड़ें</button>' +
+    '<details style="margin-top:14px"><summary class="muted small">Create a new household (first time only) / नया घर बनाएँ</summary><div class="field" style="margin-top:8px"><input id="houseName" placeholder="Household name"></div><button class="btn sec" data-a="createHouse">Create / बनाएँ</button></details>' +
     '<div class="row" style="margin-top:12px"><button class="btn sec mini" data-a="logout">Logout</button></div></div>';
 }
 function viewPending() {
@@ -515,10 +572,10 @@ function viewMamta() {
 }
 function todoCard() {
   var u = unverified(), a = pendingApprovals(), lc = lastCheck(), age = lc ? daysBetween(lc.check_date, today()) : null, items = [];
-  if (u.length) items.push('<div class="it"><div class="ic">🔎</div><div class="tx"><b>' + t('toCheck', { n: u.length }) + '</b>' + (u.some(function (e) { return daysBetween(e.expense_date, today()) > 7; }) ? '<small class="err">7+ din purani bhi hain</small>' : '') + '</div><button class="btn mini" data-a="verifyList">' + t('verify') + '</button></div>');
+  if (u.length) items.push('<div class="it"><div class="ic">🔎</div><div class="tx"><b>' + t('toCheck', { n: u.length }) + '</b>' + (u.some(function (e) { return daysBetween(e.expense_date, today()) > 7; }) ? '<small class="err">' + t('old7') + '</small>' : '') + '</div><button class="btn mini" data-a="verifyList">' + t('verify') + '</button></div>');
   if (a.length) items.push('<div class="it"><div class="ic">🧾</div><div class="tx"><b>' + t('toApprove', { n: a.length }) + '</b></div><button class="btn mini" data-a="approveList">' + t('approve') + '</button></div>');
   if (age === null || age >= 15) items.push('<div class="it"><div class="ic">💰</div><div class="tx"><b>' + t('cashCheckDue') + '</b>' + (lc ? '<small>' + t('cashCheckOk', { d: age }) + '</small>' : '') + '</div><button class="btn mini" data-a="cashCheck">' + t('cashCount') + '</button></div>');
-  if (lc && lc.diff != 0) items.push('<div class="it"><div class="ic">⚠️</div><div class="tx"><b>Last ginti mein farak: ₹' + money(lc.diff) + '</b><small>' + prettyDate(lc.check_date) + '</small></div></div>');
+  if (lc && lc.diff != 0) items.push('<div class="it"><div class="ic">⚠️</div><div class="tx"><b>' + t('lastDiff', { a: money(lc.diff) }) + '</b><small>' + prettyDate(lc.check_date) + '</small></div></div>');
   return '<div class="card todo"><h2>' + t('todo') + '</h2><div class="list">' + (items.join('') || '<div class="muted">' + t('allDone') + '</div>') + '</div></div>';
 }
 function viewShrey() {
@@ -539,7 +596,7 @@ function viewOwner() {
   var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member">Mamta</option><option value="admin">Shrey</option><option value="guest">Guest</option></select>';
   return header(sel) + al +
     '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Owed to people</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>' + t('cashWithPeople') + '</span><b>₹' + money(advances()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
-    '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">Loan wapsi</button><button class="btn sec" data-a="fundFix">Galti sudhaar</button></div></div>' +
+    '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">' + t('loanRepay') + '</button><button class="btn sec" data-a="fundFix">' + t('fundFix') + '</button></div></div>' +
     insightsCard() + duesCard() + todoCard() + passbookCard(lb) + entriesCard() + ccCard() + chartsCard() + closeCard() + historyCard() + teamCard() + settingsCard() + backupsCard() + suggestionsCard() + exportCard();
 }
 
@@ -624,9 +681,9 @@ function closeCard() {
   }).join('');
   return '<div class="card"><h2>Month close <small>closed months can only be corrected</small></h2><div class="list">' + (rows || '<div class="muted">No past months yet.</div>') + '</div><div class="small muted" style="margin-top:6px">Closing a month also closes all earlier open months. The final statement is emailed to ' + esc(ST.hh.report_email || '—') + '.</div></div>';
 }
-var TX_LBL = { fund_add: 'Top-up', expense: 'Expense (fund)', own_pocket: 'Own-pocket expense', settlement: 'Paid back', loan_adjust: 'Adjusted in top-up', loan_repay: 'Loan repaid', fund_correction: 'Fund correction', expense_edit: 'Entry edited', expense_removed: 'Entry removed', correction: 'Correction', expense_deleted: 'Deleted (old app)', fund_remove: 'Fund kam (old)', reserve_add: 'Reserve add (old)', reserve_remove: 'Reserve kam (old)' };
+var TX_LBL = { fund_add: 'Top-up', expense: 'Expense (fund)', own_pocket: 'Own-pocket expense', settlement: 'Paid back', loan_adjust: 'Adjusted in top-up', loan_repay: 'Loan repaid', fund_correction: 'Fund correction', expense_edit: 'Entry edited', expense_removed: 'Entry removed', correction: 'Correction', expense_deleted: 'Deleted (old app)', fund_remove: 'Fund reduced (old)', reserve_add: 'Reserve add (old)', reserve_remove: 'Reserve reduced (old)' };
 function historyCard() {
-  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); return '<div class="it" style="cursor:default"><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(x.note || '') + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
+  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); return '<div class="it" style="cursor:default"><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(noteTx(x.note)) + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
   return '<div class="card"><h2>Money history</h2><div class="list">' + listWithMore('tx', ST.txs, row) + '</div></div>';
 }
 function teamCard() {
@@ -714,7 +771,7 @@ function expenseForm(e) {
       var reason = $('fReason').value.trim(); if (!reason) { $('fMsg').textContent = t('reason'); return; }
       busy(btn, true);
       try { await rpc('edit_expense', Object.assign({ p_id: e.id, p_category: selCat, p_amount: amt, p_note: $('fNote').value.trim(), p_date: date, p_has_bill: !!e.has_bill, p_reason: reason, p_paid_by: selPay }, splitArgs(cp.shares))); }
-      catch (er) { busy(btn, false); $('fMsg').textContent = er.message; return; }
+      catch (er) { busy(btn, false); $('fMsg').textContent = dbMsg(er.message); return; }
     } else {
       if (isDuplicate(ST.expenses, amt, selCat, date) && !(await confirmBox(t('dupAsk'), '✓'))) return;
       busy(btn, true);
@@ -722,7 +779,7 @@ function expenseForm(e) {
         var photo = null, file = $('fPhoto') && $('fPhoto').files[0];
         if (file) { var blob = await compressImage(file), path = ST.hh.id + '/' + ST.user.id + '/' + Date.now() + '.jpg'; var up = await sb.storage.from('bill-photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false }); if (up.error) throw up.error; photo = path; }
         await rpc('add_expense', Object.assign({ p_household: ST.hh.id, p_category: selCat, p_amount: amt, p_note: $('fNote').value.trim(), p_date: date, p_has_bill: !!photo, p_photo_url: photo, p_paid_by: selPay }, splitArgs(cp.shares)));
-      } catch (er) { busy(btn, false); var mm = $('fMsg'); if (mm) mm.textContent = er.message; else showErr(er); return; }
+      } catch (er) { busy(btn, false); var mm = $('fMsg'); if (mm) mm.textContent = dbMsg(er.message); else showErr(er); return; }
     }
     closeModal(); toast(t('saved')); await refresh();
   });
@@ -754,7 +811,7 @@ function detail(id) {
   if (canCorrect(e, r, ST.closes)) btns += '<button class="btn" data-a="correctExp" data-id="' + e.id + '">↩ ' + t('correct') + '</button>';
   if (canRemove(e, r, ST.closes)) btns += '<button class="btn danger" data-a="removeExp" data-id="' + e.id + '">Remove</button>';
   if (r !== 'guest' && (e.edit_count || e.corrected_at || e.removed_at)) btns += '<button class="btn sec" data-a="hist" data-id="' + e.id + '">' + t('history') + '</button>';
-  openModal(sheetHead(esc(e.note || catName(e.category))) + '<table class="t">' + info.map(function (x) { return '<tr><td class="muted">' + x[0] + '</td><td style="white-space:normal">' + x[1] + '</td></tr>'; }).join('') + '</table><div class="actions" style="margin-top:12px">' + btns + '</div>' + (st === 'lock' && !canCorrect(e, r, ST.closes) ? '<p class="small muted">🔒 ' + (LANG === 'hi' ? 'ये महीना बंद है।' : 'This month is closed.') + '</p>' : ''));
+  openModal(sheetHead(esc(noteTx(e.note) || catName(e.category))) + '<table class="t">' + info.map(function (x) { return '<tr><td class="muted">' + x[0] + '</td><td style="white-space:normal">' + x[1] + '</td></tr>'; }).join('') + '</table><div class="actions" style="margin-top:12px">' + btns + '</div>' + (st === 'lock' && !canCorrect(e, r, ST.closes) ? '<p class="small muted">🔒 ' + (LANG === 'hi' ? 'ये महीना बंद है।' : 'This month is closed.') + '</p>' : ''));
 }
 async function showHistory(id) {
   var rows = await q(sb.from('expense_edits').select('*').eq('expense_id', id).order('edited_at', { ascending: true }));
@@ -793,11 +850,11 @@ function returnModal(p) {
 }
 function verifyModal() {
   var u = unverified();
-  openModal(sheetHead(t('toCheck', { n: u.length })) + '<div class="list">' + u.map(function (e) { return '<div class="it" style="cursor:default"><div class="ic">' + catIcon(e.category) + '</div><div class="tx"><b>' + esc(e.note || catName(e.category)) + '</b><small>' + prettyDate(e.expense_date) + ' · ' + esc(ccLabel(e)) + (e.paid_by !== 'fund' ? ' · ' + esc(pName(e.paid_by)) : '') + '</small></div><div class="am">₹' + money(e.amount) + '</div><button class="btn green mini" data-a="verifyOne" data-id="' + e.id + '">✓</button><button class="btn sec mini" data-a="detail" data-id="' + e.id + '">…</button></div>'; }).join('') + '</div>' + (u.length ? '<button class="btn huge green" data-a="verifyAll" style="margin-top:10px">' + t('verifyAll') + '</button>' : '<div class="muted">' + t('allDone') + '</div>'));
+  openModal(sheetHead(t('toCheck', { n: u.length })) + '<div class="list">' + u.map(function (e) { return '<div class="it" style="cursor:default"><div class="ic">' + catIcon(e.category) + '</div><div class="tx"><b>' + esc(noteTx(e.note) || catName(e.category)) + '</b><small>' + prettyDate(e.expense_date) + ' · ' + esc(ccLabel(e)) + (e.paid_by !== 'fund' ? ' · ' + esc(pName(e.paid_by)) : '') + '</small></div><div class="am">₹' + money(e.amount) + '</div><button class="btn green mini" data-a="verifyOne" data-id="' + e.id + '">✓</button><button class="btn sec mini" data-a="detail" data-id="' + e.id + '">…</button></div>'; }).join('') + '</div>' + (u.length ? '<button class="btn huge green" data-a="verifyAll" style="margin-top:10px">' + t('verifyAll') + '</button>' : '<div class="muted">' + t('allDone') + '</div>'));
 }
 function approveModal() {
   var a = pendingApprovals();
-  openModal(sheetHead(t('toApprove', { n: a.length })) + '<div class="list">' + a.map(function (s) { var items = ST.expenses.filter(function (e) { return e.settlement_id === s.id; }); return '<div class="it" style="cursor:default"><div class="tx"><b>' + esc(pName(s.payee)) + ' · ₹' + money(s.amount) + '</b><small>' + prettyDate(s.settle_date) + (s.note ? ' · ' + esc(s.note) : '') + (items.length ? ' · ' + items.map(function (e) { return esc(e.note || catName(e.category)) + ' ₹' + money(e.amount); }).join(', ') : '') + '</small></div><button class="btn green mini" data-a="approveOne" data-id="' + s.id + '">' + t('approve') + '</button></div>'; }).join('') + '</div>');
+  openModal(sheetHead(t('toApprove', { n: a.length })) + '<div class="list">' + a.map(function (s) { var items = ST.expenses.filter(function (e) { return e.settlement_id === s.id; }); return '<div class="it" style="cursor:default"><div class="tx"><b>' + esc(pName(s.payee)) + ' · ₹' + money(s.amount) + '</b><small>' + prettyDate(s.settle_date) + (s.note ? ' · ' + esc(s.note) : '') + (items.length ? ' · ' + items.map(function (e) { return esc(noteTx(e.note) || catName(e.category)) + ' ₹' + money(e.amount); }).join(', ') : '') + '</small></div><button class="btn green mini" data-a="approveOne" data-id="' + s.id + '">' + t('approve') + '</button></div>'; }).join('') + '</div>');
 }
 function cashCheckModal() {
   openModal(sheetHead('💰 ' + t('cashCount')) + '<p>App: <b>₹' + money(fund()) + '</b></p><div class="field"><label>' + t('counted') + '</label><input id="ccCount" class="amount-big" type="number" inputmode="decimal"></div><div class="field"><label>' + t('note') + '</label><input id="ccNote"></div><div id="ccDiff" style="font-size:17px;margin-bottom:8px"></div><button class="btn huge" id="ccGo">' + t('save') + '</button>');
@@ -816,11 +873,11 @@ function topupModal() {
 }
 function repayModal() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today());
-  openModal(sheetHead('Loan wapsi (repayment to Shreyansh)') + '<p>Payable today: <b>₹' + money2(lb.balance) + '</b> · Fund ₹' + money(fund()) + '</p><div class="field"><label>AMOUNT ₹</label><input id="rpAmt" class="amount-big" type="number" inputmode="decimal"></div><div class="field"><label>FROM</label><select id="rpFrom"><option value="fund">House cash (surplus) — Fund goes down</option><option value="outside">Outside (business etc.) — Fund unchanged</option></select></div><div class="field"><label>DATE</label><input id="rpDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="rpNote"></div><button class="btn huge" id="rpGo">Save</button>');
+  openModal(sheetHead(t('loanRepay') + ' → Shreyansh') + '<p>Payable today: <b>₹' + money2(lb.balance) + '</b> · Fund ₹' + money(fund()) + '</p><div class="field"><label>AMOUNT ₹</label><input id="rpAmt" class="amount-big" type="number" inputmode="decimal"></div><div class="field"><label>FROM</label><select id="rpFrom"><option value="fund">House cash (surplus) — Fund goes down</option><option value="outside">Outside (business etc.) — Fund unchanged</option></select></div><div class="field"><label>DATE</label><input id="rpDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="rpNote"></div><button class="btn huge" id="rpGo">Save</button>');
   $('rpGo').onclick = guard(async function () { await rpc('loan_repay', { p_household: ST.hh.id, p_amount: Number($('rpAmt').value), p_date: $('rpDate').value, p_from: $('rpFrom').value, p_note: $('rpNote').value.trim() }); closeModal(); toast('Saved'); await refresh(); });
 }
 function fundFixModal() {
-  openModal(sheetHead('Galti sudhaar (fund correction)') + '<p class="small muted">Use only to fix a mistake in the fund balance. Normal spending goes through expenses; repayments through Loan wapsi.</p><div class="field"><label>CHANGE ₹ (use − to reduce)</label><input id="fxAmt" type="number" inputmode="decimal" placeholder="-500"></div><div class="field"><label>REASON (required)</label><input id="fxReason"></div><label class="row small"><input type="checkbox" id="fxLoan"> This fixes a wrongly entered top-up (also changes the loan)</label><button class="btn huge" id="fxGo" style="margin-top:10px">Save</button>');
+  openModal(sheetHead(t('fundFix')) + '<p class="small muted">Use only to fix a mistake in the fund balance. Normal spending goes through expenses; repayments through Loan repayment.</p><div class="field"><label>CHANGE ₹ (use − to reduce)</label><input id="fxAmt" type="number" inputmode="decimal" placeholder="-500"></div><div class="field"><label>REASON (required)</label><input id="fxReason"></div><label class="row small"><input type="checkbox" id="fxLoan"> This fixes a wrongly entered top-up (also changes the loan)</label><button class="btn huge" id="fxGo" style="margin-top:10px">Save</button>');
   $('fxGo').onclick = guard(async function () { await rpc('fund_correct', { p_household: ST.hh.id, p_delta: Number($('fxAmt').value), p_reason: $('fxReason').value.trim(), p_loan: $('fxLoan').checked }); closeModal(); toast('Saved'); await refresh(); });
 }
 function correctModal(id) {
@@ -831,7 +888,7 @@ function correctModal(id) {
     '<div class="field"><label>' + t('forWhom') + '</label><div id="crCC"></div></div><div class="field"><label>NOTE</label><input id="crNote" value="' + esc(e.note) + '"></div><div class="field"><label>' + t('reason') + '</label><input id="crReason"></div><button class="btn huge" id="crGo">Save correction</button><div id="crMsg" class="small err"></div>');
   var picker = ccPicker($('crCC'), shares(e), function () { return Number($('crAmt').value) || 0; }); $('crAmt').oninput = function () { picker.refresh(); };
   document.querySelectorAll('#crCats [data-cat]').forEach(function (b) { b.onclick = function () { cat = b.dataset.cat; document.querySelectorAll('#crCats [data-cat]').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
-  $('crGo').onclick = guard(async function () { var a = Number($('crAmt').value); var cp = a > 0 ? picker.get() : { ok: true, shares: [['Household', 0]] }; if (!cp.ok) { $('crMsg').textContent = cp.err; return; } try { await rpc('correct_expense', Object.assign({ p_id: e.id, p_category: cat, p_amount: a, p_note: $('crNote').value.trim(), p_reason: $('crReason').value.trim() }, splitArgs(cp.shares))); } catch (er) { $('crMsg').textContent = er.message; return; } closeModal(); toast('Saved'); await refresh(); });
+  $('crGo').onclick = guard(async function () { var a = Number($('crAmt').value); var cp = a > 0 ? picker.get() : { ok: true, shares: [['Household', 0]] }; if (!cp.ok) { $('crMsg').textContent = cp.err; return; } try { await rpc('correct_expense', Object.assign({ p_id: e.id, p_category: cat, p_amount: a, p_note: $('crNote').value.trim(), p_reason: $('crReason').value.trim() }, splitArgs(cp.shares))); } catch (er) { $('crMsg').textContent = dbMsg(er.message); return; } closeModal(); toast('Saved'); await refresh(); });
 }
 
 /* ---------- reports & exports ---------- */
@@ -872,8 +929,8 @@ function monthReportModal(m) {
 function supervisorReport() {
   var lc = ST.checks[1] || null, from = lc ? lc.check_date : addDays(today(), -14), cur = ST.checks[0];
   var spend = spendBetween(ST.expenses, from, today()), cnt = ST.expenses.filter(function (e) { return live(e) && e.expense_date >= from; }).length, d = bals(), u = unverified(), ap = pendingApprovals(), n = nextCashInfo(ST.expenses, ST.txs, fund(), dues());
-  var txt = '📋 *Supervisor report* — ' + ST.hh.name + '\n' + prettyDate(from) + ' → ' + prettyDate(today()) + '\n\nKharcha: ₹' + money(spend) + ' (' + cnt + ' entries)\nFund (app): ₹' + money(fund()) + (cur ? '\nCash gina (' + prettyDate(cur.check_date) + '): ₹' + money(cur.counted) + ' · farak ₹' + money(cur.diff) : '\nCash ginti: abhi nahi hui') +
-    '\nLog: ' + payers().filter(function (p) { return d[p]; }).map(function (p) { return balLine(p, d[p].bal); }).join(', ') + '\nSelf-settlement baaki: ' + ap.length + '\nCheck baaki entries: ' + u.length + (ST.hh.low_fund_threshold != null ? '\nFund limit: ₹' + money(ST.hh.low_fund_threshold) : '');
+  var txt = '📋 *' + t('rpTitle') + '* — ' + ST.hh.name + '\n' + prettyDate(from) + ' → ' + prettyDate(today()) + '\n\n' + t('rpSpend') + ': ₹' + money(spend) + ' (' + cnt + ' entries)\nFund (app): ₹' + money(fund()) + (cur ? '\n' + t('rpCounted') + ' (' + prettyDate(cur.check_date) + '): ₹' + money(cur.counted) + ' · ' + t('rpDiff') + ' ₹' + money(cur.diff) : '\n' + t('rpNoCount')) +
+    '\n' + t('rpPeople') + ': ' + payers().filter(function (p) { return d[p]; }).map(function (p) { return balLine(p, d[p].bal); }).join(', ') + '\n' + t('rpSelf') + ': ' + ap.length + '\n' + t('rpUnchecked') + ': ' + u.length + (ST.hh.low_fund_threshold != null ? '\n' + t('rpLimit') + ': ₹' + money(ST.hh.low_fund_threshold) : '');
   openModal(sheetHead('📤 ' + t('sendReport')) + '<pre style="white-space:pre-wrap;font-family:inherit;background:var(--paper2);padding:10px;border-radius:8px">' + esc(txt) + '</pre><div class="actions"><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(txt) + '">📤 WhatsApp</a><button class="btn sec" id="srPdf">📄 PDF</button></div>');
   $('srPdf').onclick = function () { printHtml('Supervisor report', '<h1>Supervisor report</h1><pre style="font-size:14px;white-space:pre-wrap">' + esc(txt) + '</pre>'); };
 }
@@ -889,16 +946,16 @@ var A = {
   login: async function (el) {
     var em = $('auEmail').value.trim().toLowerCase(), pw = $('auPass').value; if (!em || !pw) return; busy(el, true); lsSet('gk14-email', em);
     var r = await sb.auth.signInWithPassword({ email: em, password: pw }); busy(el, false);
-    if (r.error) { $('authMsg').textContent = /confirm/i.test(r.error.message) ? 'Email confirm nahi hua — Shreyansh se "Reset password" karwayein.' : /invalid/i.test(r.error.message) ? 'Email ya password galat hai. · ईमेल या पासवर्ड गलत है।' : r.error.message; return; }
+    if (r.error) { $('authMsg').textContent = /confirm/i.test(r.error.message) ? 'Email not confirmed — ask Shreyansh to reset your password. · ईमेल कन्फ़र्म नहीं हुआ — श्रेयांश से पासवर्ड रीसेट करवाएँ।' : /invalid/i.test(r.error.message) ? 'Wrong email or password. · ईमेल या पासवर्ड गलत है।' : r.error.message; return; }
     await afterLogin(r.data.user);
   },
   signup: async function (el) {
     var nm = $('suName').value.trim(), em = $('auEmail').value.trim().toLowerCase(), pw = $('auPass').value;
-    if (!nm || !em || pw.length < 6) { $('authMsg').textContent = 'Naam, email aur 6+ akshar ka password daalo'; return; }
+    if (!nm || !em || pw.length < 6) { $('authMsg').textContent = 'Enter name, email and a password of 6+ characters · नाम, ईमेल और 6+ अक्षर का पासवर्ड डालें'; return; }
     busy(el, true); var r = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm }, emailRedirectTo: location.origin } }); busy(el, false);
     if (r.error) { $('authMsg').textContent = r.error.message; return; }
     lsSet('gk14-email', em);
-    if (r.data.session) await afterLogin(r.data.user); else { ST.authTab = 'login'; render(); $('authMsg').textContent = 'Account ban gaya. Email confirm karke login karein (ya Shreyansh se reset karwayein).'; }
+    if (r.data.session) await afterLogin(r.data.user); else { ST.authTab = 'login'; render(); $('authMsg').textContent = 'Account created. Confirm your email, then log in (or ask Shreyansh to reset). · खाता बन गया। ईमेल कन्फ़र्म करके लॉगिन करें।'; }
   },
   logout: async function () { if (chan) try { sb.removeChannel(chan); } catch (e) { } await sb.auth.signOut(); resetState(); render(); },
   refresh: async function () { await refresh(); toast('✓'); },
@@ -934,7 +991,7 @@ var A = {
   sugDel: async function (el) { await rpc('delete_suggestion', { p_id: el.dataset.id }); await refresh(); },
   approveMember: async function (el) { await rpc('set_member_role', { p_household: ST.hh.id, p_user: el.dataset.u, p_role: el.dataset.r }); toast('Approved'); await refresh(); },
   setRole: async function (el) { if (el.dataset.r === 'remove' && !(await confirmBox('Remove this person?', 'Remove'))) return; await rpc('set_member_role', { p_household: ST.hh.id, p_user: el.dataset.u, p_role: el.dataset.r }); await refresh(); },
-  resetPw: async function (el) { var pw = prompt('New password for ' + el.dataset.n + ' (min 6 characters):', 'Ghar@' + Math.floor(1000 + Math.random() * 9000)); if (!pw) return; await rpc('admin_set_password', { p_household: ST.hh.id, p_user: el.dataset.u, p_password: pw }); openModal(sheetHead('🔑 Password changed') + '<p>Send this to ' + esc(el.dataset.n) + ':</p><p class="kbd" style="font-size:20px">' + esc(pw) + '</p><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('Ghar Kharcha app ka naya password: ' + pw + '\nLink: ' + location.origin) + '">📤 WhatsApp</a>'); },
+  resetPw: async function (el) { var pw = prompt('New password for ' + el.dataset.n + ' (min 6 characters):', 'Ghar@' + Math.floor(1000 + Math.random() * 9000)); if (!pw) return; await rpc('admin_set_password', { p_household: ST.hh.id, p_user: el.dataset.u, p_password: pw }); openModal(sheetHead('🔑 Password changed') + '<p>Send this to ' + esc(el.dataset.n) + ':</p><p class="kbd" style="font-size:20px">' + esc(pw) + '</p><a class="btn" target="_blank" href="https://wa.me/?text=' + encodeURIComponent(t('newPwMsg', { p: pw, u: location.origin })) + '">📤 WhatsApp</a>'); },
   regen: async function () { if (!(await confirmBox('Make new family and guest codes? Old codes stop working.', 'Yes'))) return; var r = await rpc('regen_codes', { p_household: ST.hh.id }); toast('New codes: ' + r.join_code + ' / ' + r.guest_code); await refresh(); },
   saveSettings: async function () { await rpc('update_household', { p_household: ST.hh.id, p_name: $('setName').value.trim(), p_report_email: $('setEmail').value.trim() }); toast('Saved'); await refresh(); },
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
