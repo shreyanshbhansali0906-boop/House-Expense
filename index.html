@@ -160,6 +160,16 @@ var T = {
   cashWithPeople: { en: 'Advance with people', hg: 'Logon ke paas advance', hi: 'लोगों के पास एडवांस' },
   lowFund: { en: 'Fund ₹{f} is below the limit ₹{l}', hg: 'Fund ₹{f} — limit ₹{l} se kam', hi: 'फंड ₹{f} — सीमा ₹{l} से कम' },
   tellBhaiya: { en: '📤 Tell Shreyansh', hg: '📤 Bhaiya ko batao', hi: '📤 भैया को बताओ' },
+  alNoTry: { en: 'no try yet', hg: 'abhi koi try nahi', hi: 'अभी तक कोई कोशिश नहीं' },
+  alWaiting: { en: 'waiting for the reply… tap ↻ Refresh in a minute', hg: 'reply ka wait… 1 min baad ↻ Refresh dabao', hi: 'जवाब का इंतज़ार… 1 मिनट बाद ↻ ताज़ा करें दबाएँ' },
+  alTimeout: { en: 'no reply in time (the service was too slow). Press Send test again.', hg: 'time par reply nahi aaya (service slow). Send test phir dabao.', hi: 'समय पर जवाब नहीं आया (सेवा धीमी थी)। "टेस्ट भेजें" फिर दबाएँ।' },
+  alKeyBad: { en: 'The API key is wrong. Activate again and paste the new key.', hg: 'API key galat hai. Activation phir se karo aur nayi key daalo.', hi: 'API की गलत है। फिर से एक्टिवेट करें और नई की डालें।' },
+  alNotAct: { en: 'This number is not activated with CallMeBot. Send "I allow callmebot to send me messages" from this WhatsApp number.', hg: 'Ye number CallMeBot par activate nahi hai. Isi WhatsApp number se "I allow callmebot to send me messages" bhejo.', hi: 'यह नंबर CallMeBot पर एक्टिवेट नहीं है। इसी व्हाट्सऐप नंबर से "I allow callmebot to send me messages" भेजें।' },
+  alOk: { en: 'Accepted. If nothing arrives on WhatsApp within a minute, activate again.', hg: 'Message le liya gaya. 1 min mein WhatsApp par na aaye to dobara activate karo.', hi: 'संदेश ले लिया गया। 1 मिनट में व्हाट्सऐप पर न आए तो दोबारा एक्टिवेट करें।' },
+  alMailOk: { en: 'Email service accepted it. The email should arrive shortly.', hg: 'Email service ne le liya. Email kuch der mein aayega.', hi: 'ईमेल सेवा ने ले लिया। ईमेल थोड़ी देर में आएगा।' },
+  alOther: { en: 'Got an unexpected answer (see the reply below).', hg: 'Kuch alag jawab aaya (neeche reply dekho).', hi: 'कुछ अलग जवाब आया (नीचे जवाब देखें)।' },
+  alReplyLbl: { en: 'Reply', hg: 'Jawab', hi: 'जवाब' },
+  alTestSent: { en: 'Test sent. Wait a few seconds, then tap ↻ Refresh to see the reply.', hg: 'Test bhej diya. Kuch second baad ↻ Refresh dabao, jawab dikhega.', hi: 'टेस्ट भेज दिया। कुछ सेकंड बाद ↻ ताज़ा करें दबाएँ, जवाब दिखेगा।' },
   eyebrow: { en: 'Household accounts', hg: 'Ghar ka hisaab', hi: 'घर का हिसाब' },
   loanRepay: { en: 'Loan repayment', hg: 'Loan wapsi', hi: 'लोन वापसी' }, fundFix: { en: 'Fund correction', hg: 'Galti sudhaar', hi: 'फंड सुधार' },
   old15: { en: 'some are 15+ days old', hg: '15+ din purani bhi hain', hi: 'कुछ 15+ दिन पुराने हैं' },
@@ -396,7 +406,7 @@ var HI_DICT = {
   'Entries': 'एंट्री', 'Top-up': 'टॉप-अप', '⬇ Excel': '⬇ एक्सेल', '⚙ Cost centres': '⚙ किसके लिए (सूची)', 'Charts': 'चार्ट', 'All time': 'शुरू से अब तक', 'Category': 'श्रेणी', 'Cost centre': 'किसके लिए', 'By category': 'श्रेणी अनुसार', 'By cost centre': 'किसके लिए अनुसार',
   'Month close': 'महीना बंद', 'closed months can only be corrected': 'बंद महीनों में सिर्फ़ सुधार हो सकता है', 'Report': 'रिपोर्ट', 'Close': 'बंद करें', 'Close month': 'महीना बंद करें', 'Month by month': 'महीनेवार', 'No past months yet.': 'अभी कोई पुराना महीना नहीं।',
   'Money history': 'पैसे का इतिहास', 'Expense (fund)': 'खर्चा (फंड से)', 'Own-pocket expense': 'अपनी जेब से खर्चा', 'Paid back': 'लौटाया', 'Adjusted in top-up': 'टॉप-अप में एडजस्ट', 'Loan repaid': 'लोन चुकाया', 'Fund correction': 'फंड सुधार', 'Entry edited': 'एंट्री बदली', 'Entry removed': 'एंट्री हटाई', 'Correction': 'सुधार', 'Deleted (old app)': 'हटाई (पुराना ऐप)', 'Fund reduced (old)': 'फंड घटा (पुराना)', 'Reserve add (old)': 'रिज़र्व जुड़ा (पुराना)', 'Reserve reduced (old)': 'रिज़र्व घटा (पुराना)',
-  'Team': 'टीम', 'Remove…': 'हटाएँ…', 'Remove': 'हटाएँ', '🔑 Reset password': '🔑 पासवर्ड बदलें', 'Family code': 'परिवार कोड', 'Guest code': 'मेहमान कोड', '↻ New codes': '↻ नए कोड', 'Anyone who joins waits for your approval.': 'जो भी जुड़ेगा, आपकी मंज़ूरी का इंतज़ार करेगा।', 'Reject': 'मना करें',
+  'Team': 'टीम', 'Remove…': 'हटाएँ…', 'Remove': 'हटाएँ', '🔑 Reset password': '🔑 पासवर्ड बदलें', 'Family code': 'परिवार कोड', 'Guest code': 'मेहमान कोड', '↻ New codes': '↻ नए कोड', 'Anyone who joins waits for your approval.': 'जो भी जुड़ेगा, आपकी मंज़ूरी का इंतज़ार करेगा।', 'Reject': 'मना करें', 'Approve as family': 'परिवार के सदस्य के रूप में मंज़ूर', 'Approve as guest': 'मेहमान के रूप में मंज़ूर',
   'Settings': 'सेटिंग्स', 'HOUSEHOLD NAME': 'घर का नाम', 'MONTHLY STATEMENT EMAIL': 'मासिक स्टेटमेंट ईमेल', 'Save': 'सेव करें', '🔔 Low-fund alert': '🔔 फंड कम होने की सूचना', 'ALERT WHEN FUND BELOW ₹ (empty = off)': 'फंड इससे कम हो तो सूचना ₹ (खाली = बंद)',
   'YOUR WHATSAPP NUMBER': 'आपका व्हाट्सऐप नंबर', 'CALLMEBOT API KEY': 'CALLMEBOT API की', 'Save alert': 'सूचना सेव करें', 'Send test': 'टेस्ट भेजें',
   'One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message': 'एक बार व्हाट्सऐप सेटअप: callmebot.com पर दिया CallMeBot नंबर अपने कॉन्टैक्ट में सेव करें, उसे यह मैसेज भेजें',
@@ -485,16 +495,27 @@ function getSb() {
 async function q(p) { var r = await p; if (r.error) throw r.error; return r.data; }
 async function rpc(fn, args) { return q(sb.rpc(fn, args || {})); }
 
+var RESET_EXPIRED = 'This reset link has expired or was already used. Request a new one. · यह लिंक खत्म हो चुका है या पहले इस्तेमाल हो चुका है। नया लिंक मंगाएँ।';
+// Password reset: the email link returns here with type=recovery in the address (or a code, after a reset was requested).
+var RECOVERY = /(^|[#&?])type=recovery(&|$)/.test((location.hash || '') + (location.search || '')) || (/[?&]code=/.test(location.search || '') && lsGet('gk-reset-asked') === '1');
+var LOGIN_NOTE = /error_code=otp_expired/.test((location.hash || '') + (location.search || '')) ? RESET_EXPIRED : '';
+function clearAddress() { try { history.replaceState(null, '', location.pathname); } catch (e) { } }
+
 /* ---------- boot & auth ---------- */
 async function boot() {
+  if (RECOVERY) ST.recovery = true;
   render();
   try {
     await getSb();
-    sb.auth.onAuthStateChange(function (ev, session) { if (ev === 'SIGNED_OUT') { resetState(); render(); } });
+    sb.auth.onAuthStateChange(function (ev) {
+      if (ev === 'SIGNED_OUT' && !ST.recovery) { resetState(); render(); }
+      if (ev === 'PASSWORD_RECOVERY') { ST.recovery = true; ST.loading = false; render(); }
+    });
     var s = await sb.auth.getSession();
-    if (s.data && s.data.session) await afterLogin(s.data.session.user); else { ST.loading = false; render(); }
+    if (s.data && s.data.session && !ST.recovery) await afterLogin(s.data.session.user); else { ST.loading = false; render(); }
   } catch (e) { ST.loading = false; ST.fatal = e.message; render(); }
 }
+
 function resetState() { var k = ST.authTab; ST = { user: null, status: null, hh: null, role: null, viewAs: null, wallet: { fund: 0 }, expenses: [], txs: [], settlements: [], closes: [], checks: [], team: [], suggestions: [], backups: [], more: {}, f: { q: '', m: 'ALL', c: 'ALL', cc: 'ALL', s: 'ALL' }, authTab: k, loading: false }; if (chan && sb) { try { sb.removeChannel(chan); } catch (e) { } } chan = null; LANG = 'hg'; }
 async function afterLogin(user) {
   ST.user = user; ST.loading = true; render();
@@ -576,6 +597,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   var v;
   if (ST.fatal && !ST.user) v = '<div class="card"><h2>⚠️</h2><p>' + esc(ST.fatal) + '</p><button class="btn" data-a="reload">Refresh</button></div>';
   else if (ST.loading) v = '<div class="card" style="text-align:center;padding:40px"><div class="muted">Loading…</div></div>';
+  else if (ST.recovery) v = viewNewPassword();
   else if (!ST.user) v = viewLogin();
   else if (!ST.status) v = viewNoHouse();
   else if (ST.role === 'pending') v = viewPending();
@@ -584,6 +606,22 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
   var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
+}
+function alertLine(lbl, x, isWa) {
+  var when = x && x.at ? ' · ' + esc(new Date(x.at).toLocaleString(LANG === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) : '';
+  var name = '<b>' + esc(lbl) + '</b>' + when, box = '<div class="small" style="margin:3px 0">';
+  if (!x || !x.at) return box + name + ' <span class="muted">' + t('alNoTry') + '</span></div>';
+  if (x.pending) return box + name + ' — <span class="muted">' + t('alWaiting') + '</span></div>';
+  if (x.timeout) return box + name + ' — <span class="err">' + t('alTimeout') + '</span></div>';
+  var body = String(x.body || ''), good = x.code >= 200 && x.code < 300 && !/invalid|not|error|unregistered|fail/i.test(body), hint;
+  if (!good && isWa && /invalid|api ?key/i.test(body)) hint = t('alKeyBad');
+  else if (!good && isWa && /not.*(activ|registr)|unregistered|activate|not found/i.test(body)) hint = t('alNotAct');
+  else hint = good ? t(isWa ? 'alOk' : 'alMailOk') : t('alOther');
+  return box + name + ' — <span class="' + (good ? 'okc' : 'err') + '">' + esc(hint) + '</span><div class="muted" style="word-break:break-word">' + esc(t('alReplyLbl')) + ': ' + esc(body.slice(0, 200) || 'HTTP ' + (x.code == null ? '—' : x.code)) + '</div></div>';
+}
+function alertReplyHtml() {
+  if (!ST.alert) return '';
+  return '<div style="margin-top:10px;padding:8px 10px;background:var(--paper2);border-radius:8px">' + alertLine('WhatsApp', ST.alert.wa, true) + alertLine('Email', ST.alert.mail, false) + '</div>';
 }
 function header(extra) {
   var r = role(), langs = [['hi', 'हिंदी'], ['hg', 'Hinglish'], ['en', 'English']];
@@ -640,7 +678,15 @@ function viewLogin() {
     '<div class="field"><label>EMAIL</label><input id="auEmail" type="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" value="' + esc(lsGet('gk14-email') || '') + '"></div>' +
     '<div class="field"><label>PASSWORD</label><input id="auPass" type="password" autocomplete="' + (L === 'signup' ? 'new-password' : 'current-password') + '"></div>' +
     '<button class="btn huge" data-a="' + (L === 'signup' ? 'signup' : 'login') + '">' + (L === 'signup' ? 'Create account / खाता बनाओ' : 'Login / लॉगिन') + '</button>' +
-    '<p class="small muted" style="margin-top:10px">Forgot password? Ask Shreyansh to reset it. · पासवर्ड भूल गए? श्रेयांश से रीसेट करवाएँ।</p><div id="authMsg" class="small err"></div></div>';
+    '<p class="small" style="margin-top:10px"><a href="#" data-a="forgotPw" style="color:var(--maroon);font-weight:700">Forgot password? · पासवर्ड भूल गए?</a></p><div id="authNote" class="small muted">' + esc(LOGIN_NOTE) + '</div><div id="authMsg" class="small err"></div></div>';
+}
+function viewNewPassword() {
+  return '<div class="card"><h2>Set a new password · नया पासवर्ड बनाएँ</h2>' +
+    '<div class="field"><label>NEW PASSWORD / नया पासवर्ड</label><input id="npPass" type="password" autocomplete="new-password"></div>' +
+    '<div class="field"><label>REPEAT PASSWORD / दोबारा लिखें</label><input id="npPass2" type="password" autocomplete="new-password"></div>' +
+    '<button class="btn huge" data-a="setNewPw">Save new password / नया पासवर्ड सेव करें</button>' +
+    '<p class="small muted" style="margin-top:10px">Use at least 6 characters. · कम से कम 6 अक्षर।</p>' +
+    '<p class="small" style="margin-top:6px"><a href="#" data-a="cancelReset" style="color:var(--maroon);font-weight:700">Back to login · लॉगिन पर वापस</a></p><div id="authMsg" class="small err"></div></div>';
 }
 function viewNoHouse() {
   return '<div class="card"><h2>Join your household / घर से जुड़ें</h2><div class="field"><label>CODE (from Shreyansh / श्रेयांश से लें)</label><input id="joinCode" autocapitalize="characters" style="text-transform:uppercase;font-size:22px;letter-spacing:3px;text-align:center"></div><button class="btn huge" data-a="join">Join / जुड़ें</button>' +
@@ -776,7 +822,7 @@ function teamCard() {
   var mine = R() === 'owner';
   var rows = ST.team.map(function (m) {
     var self = m.user_id === ST.user.id, ctl = '';
-    if (mine && !self) {
+    if (mine && !self && m.role !== 'owner') {
       if (m.role === 'pending') ctl = '<button class="btn green mini" data-a="approveMember" data-u="' + m.user_id + '" data-r="' + (m.requested_role || 'guest') + '">Approve as ' + (m.requested_role === 'member' ? 'family' : 'guest') + '</button><button class="btn sec mini" data-a="setRole" data-u="' + m.user_id + '" data-r="remove">Reject</button>';
       else ctl = '<select data-a="roleSel" data-u="' + m.user_id + '">' + [['admin', 'Supervisor'], ['member', 'House Manager'], ['guest', 'Guest']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === m.role ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '<option value="remove">Remove…</option></select><button class="btn sec mini" data-a="resetPw" data-u="' + m.user_id + '" data-n="' + esc(m.display_name) + '">🔑 Reset password</button>';
     }
@@ -787,7 +833,7 @@ function teamCard() {
 function settingsCard() {
   var rates = (ST.hh.loan_rates || []).map(function (r) { return 'from ' + r.from + ': ' + r.rate + '%'; }).join(' · ');
   return '<div class="card"><h2>Settings</h2><div class="grid2"><div class="field"><label>HOUSEHOLD NAME</label><input id="setName" value="' + esc(ST.hh.name) + '"></div><div class="field"><label>MONTHLY STATEMENT EMAIL</label><input id="setEmail" type="email" value="' + esc(ST.hh.report_email || '') + '"></div></div><button class="btn sec" data-a="saveSettings">Save</button>' +
-    '<h3 style="margin:16px 0 6px;font-size:15px;color:var(--dark)">🔔 Low-fund alert</h3><div class="grid2"><div class="field"><label>ALERT WHEN FUND BELOW ₹ (empty = off)</label><input id="alThr" type="number" inputmode="decimal" value="' + (ST.alert && ST.alert.threshold != null ? ST.alert.threshold : '') + '"></div><div class="field"><label>YOUR WHATSAPP NUMBER</label><input id="alPhone" type="tel" placeholder="+919876543210" value="' + esc((ST.alert && ST.alert.wa_phone) || '') + '"></div><div class="field full"><label>CALLMEBOT API KEY ' + (ST.alert && ST.alert.wa_key_set ? '(saved ✓ — leave empty to keep)' : '') + '</label><input id="alKey" placeholder="' + (ST.alert && ST.alert.wa_key_set ? '••••••' : 'e.g. 1234567') + '"></div></div><div class="actions"><button class="btn sec" data-a="saveAlert">Save alert</button><button class="btn sec" data-a="testAlert">Send test</button></div><div class="small muted" style="margin-top:6px">One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message <b>I allow callmebot to send me messages</b>, and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.</div>' +
+    '<h3 style="margin:16px 0 6px;font-size:15px;color:var(--dark)">🔔 Low-fund alert</h3><div class="grid2"><div class="field"><label>ALERT WHEN FUND BELOW ₹ (empty = off)</label><input id="alThr" type="number" inputmode="decimal" value="' + (ST.alert && ST.alert.threshold != null ? ST.alert.threshold : '') + '"></div><div class="field"><label>YOUR WHATSAPP NUMBER</label><input id="alPhone" type="tel" placeholder="+919876543210" value="' + esc((ST.alert && ST.alert.wa_phone) || '') + '"></div><div class="field full"><label>CALLMEBOT API KEY ' + (ST.alert && ST.alert.wa_key_set ? '(saved ✓ — leave empty to keep)' : '') + '</label><input id="alKey" placeholder="' + (ST.alert && ST.alert.wa_key_set ? '••••••' : 'e.g. 1234567') + '"></div></div><div class="actions"><button class="btn sec" data-a="saveAlert">Save alert</button><button class="btn sec" data-a="testAlert">Send test</button></div>' + alertReplyHtml() + '<div class="small muted" style="margin-top:6px">One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message <b>I allow callmebot to send me messages</b>, and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.</div>' +
     '<div style="margin-top:12px" class="small">Loan rate: ' + esc(rates) + '</div><div class="row" style="margin-top:6px"><input id="rateFrom" type="date" value="' + (nextMonth(cm()) + '-01') + '" style="padding:7px"><input id="rateVal" type="number" step="0.05" min="0" max="10" placeholder="% / month" style="padding:7px;width:110px"><button class="btn sec mini" data-a="addRate">Add new rate</button></div><div class="small muted">New rates apply from a date this month or later; past months never change.</div></div>';
 }
 function backupsCard() {
@@ -1036,7 +1082,33 @@ var A = {
   reload: function () { location.reload(); },
   closeModal: closeModal,
   authTab: function (el) { ST.authTab = el.dataset.v; render(); },
-  login: async function (el) {
+  forgotPw: async function (el) {
+    var em = $('auEmail').value.trim().toLowerCase();
+    if (!em) { $('authMsg').textContent = 'Type your email above first. · पहले ऊपर ईमेल लिखें।'; return; }
+    busy(el, true); lsSet('gk14-email', em); lsSet('gk-reset-asked', '1');
+    var r = await sb.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname }); busy(el, false);
+    $('authMsg').textContent = '';
+    if (r.error) { $('authMsg').textContent = r.error.message; return; }
+    $('authNote').textContent = 'If this email has an account, a reset link is on its way. Check spam too. · अगर इस ईमेल का खाता है, तो रीसेट लिंक भेज दिया गया है। स्पैम भी देखें।';
+  },
+  setNewPw: async function (el) {
+    var p1 = $('npPass').value, p2 = $('npPass2').value;
+    if (p1.length < 6) { $('authMsg').textContent = 'Use at least 6 characters. · कम से कम 6 अक्षर।'; return; }
+    if (p1 !== p2) { $('authMsg').textContent = "The two passwords don't match. · दोनों पासवर्ड एक जैसे नहीं हैं।"; return; }
+    busy(el, true);
+    var ss = await sb.auth.getSession();
+    if (!ss.data || !ss.data.session) { busy(el, false); ST.recovery = false; LOGIN_NOTE = RESET_EXPIRED; clearAddress(); render(); return; }
+    var r = await sb.auth.updateUser({ password: p1 });
+    if (r.error) { busy(el, false); $('authMsg').textContent = r.error.message; return; }
+    LOGIN_NOTE = 'Password updated. Log in with the new password. · पासवर्ड बदल गया। नए पासवर्ड से लॉगिन करें।';
+    lsSet('gk-reset-asked', ''); ST.recovery = false; clearAddress();
+    await sb.auth.signOut(); resetState(); render();
+  },
+  cancelReset: async function () {
+    ST.recovery = false; LOGIN_NOTE = ''; lsSet('gk-reset-asked', ''); clearAddress();
+    await sb.auth.signOut(); resetState(); render();
+  },
+  login: async function (el) { LOGIN_NOTE = '';
     var em = $('auEmail').value.trim().toLowerCase(), pw = $('auPass').value; if (!em || !pw) return; busy(el, true); lsSet('gk14-email', em);
     var r = await sb.auth.signInWithPassword({ email: em, password: pw }); busy(el, false);
     if (r.error) { $('authMsg').textContent = /confirm/i.test(r.error.message) ? 'Email not confirmed — ask Shreyansh to reset your password. · ईमेल कन्फ़र्म नहीं हुआ — श्रेयांश से पासवर्ड रीसेट करवाएँ।' : /invalid/i.test(r.error.message) ? 'Wrong email or password. · ईमेल या पासवर्ड गलत है।' : r.error.message; return; }
@@ -1089,7 +1161,7 @@ var A = {
   saveSettings: async function () { await rpc('update_household', { p_household: ST.hh.id, p_name: $('setName').value.trim(), p_report_email: $('setEmail').value.trim() }); toast('Saved'); await refresh(); },
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
   saveAlert: async function () { var v = $('alThr').value.trim(); var r = await rpc('set_fund_alert', { p_household: ST.hh.id, p_threshold: v === '' ? null : Number(v), p_phone: $('alPhone').value.trim() || null, p_apikey: $('alKey').value.trim() || null }); toast(r.sent_now ? 'Saved — fund is already below the limit, alert sent' : 'Alert saved'); await refresh(); },
-  testAlert: async function () { var r = await rpc('test_fund_alert', { p_household: ST.hh.id }); toast('Test sent: ' + (r || 'nothing configured')); },
+  testAlert: async function () { await rpc('test_fund_alert', { p_household: ST.hh.id }); toast(t('alTestSent')); },
   ccEdit: async function () { var v = prompt('Cost centres (comma separated):', ccList().join(', ')); if (v === null) return; var list = uniq(v.split(',').map(function (x) { return x.trim(); })); if (list.indexOf('Household') < 0) list.unshift('Household'); await rpc('set_cost_centres', { p_household: ST.hh.id, p_list: list }); await refresh(); }
 };
 document.addEventListener('click', function (ev) {
