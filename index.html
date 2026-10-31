@@ -163,9 +163,12 @@ var T = {
   alNoTry: { en: 'no try yet', hg: 'abhi koi try nahi', hi: 'अभी तक कोई कोशिश नहीं' },
   alWaiting: { en: 'waiting for the reply… tap ↻ Refresh in a minute', hg: 'reply ka wait… 1 min baad ↻ Refresh dabao', hi: 'जवाब का इंतज़ार… 1 मिनट बाद ↻ ताज़ा करें दबाएँ' },
   alTimeout: { en: 'no reply in time (the service was too slow). Press Send test again.', hg: 'time par reply nahi aaya (service slow). Send test phir dabao.', hi: 'समय पर जवाब नहीं आया (सेवा धीमी थी)। "टेस्ट भेजें" फिर दबाएँ।' },
-  alKeyBad: { en: 'The API key is wrong. Activate again and paste the new key.', hg: 'API key galat hai. Activation phir se karo aur nayi key daalo.', hi: 'API की गलत है। फिर से एक्टिवेट करें और नई की डालें।' },
-  alNotAct: { en: 'This number is not activated with CallMeBot. Send "I allow callmebot to send me messages" from this WhatsApp number.', hg: 'Ye number CallMeBot par activate nahi hai. Isi WhatsApp number se "I allow callmebot to send me messages" bhejo.', hi: 'यह नंबर CallMeBot पर एक्टिवेट नहीं है। इसी व्हाट्सऐप नंबर से "I allow callmebot to send me messages" भेजें।' },
-  alOk: { en: 'Accepted. If nothing arrives on WhatsApp within a minute, activate again.', hg: 'Message le liya gaya. 1 min mein WhatsApp par na aaye to dobara activate karo.', hi: 'संदेश ले लिया गया। 1 मिनट में व्हाट्सऐप पर न आए तो दोबारा एक्टिवेट करें।' },
+  alOk: { en: 'Meta accepted it. It should reach WhatsApp within a minute.', hg: 'Meta ne le liya. 1 min mein WhatsApp par aana chahiye.', hi: 'Meta ने संदेश ले लिया। 1 मिनट में व्हाट्सऐप पर आना चाहिए।' },
+  alTokenBad: { en: 'The Meta access token is wrong or expired. Update META_WA_TOKEN in Supabase secrets.', hg: 'Meta access token galat ya expire ho gaya hai. Supabase secrets mein META_WA_TOKEN update karo.', hi: 'Meta का एक्सेस टोकन गलत या समाप्त हो गया है। Supabase सीक्रेट्स में META_WA_TOKEN अपडेट करें।' },
+  alSecret: { en: 'The WhatsApp secrets are missing in Supabase (META_WA_TOKEN and META_WA_PHONE_ID).', hg: 'Supabase mein WhatsApp secrets nahi hain (META_WA_TOKEN aur META_WA_PHONE_ID).', hi: 'Supabase में WhatsApp सीक्रेट नहीं हैं (META_WA_TOKEN और META_WA_PHONE_ID)।' },
+  alTplMissing: { en: 'The message template low_fund_alert is not created or not approved yet. See the setup steps.', hg: 'Message template low_fund_alert abhi bana nahi ya approve nahi hua. Setup steps dekho.', hi: 'संदेश टेम्पलेट low_fund_alert अभी बना नहीं है या मंज़ूर नहीं हुआ। सेटअप के चरण देखें।' },
+  alNotAllowed: { en: 'Meta does not allow this number yet. On a test number, add it under WhatsApp > API Setup > To.', hg: 'Meta is number ko abhi allow nahi karta. Test number par ise WhatsApp > API Setup > To mein add karo.', hi: 'Meta इस नंबर को अभी अनुमति नहीं देता। टेस्ट नंबर पर इसे WhatsApp > API Setup > To में जोड़ें।' },
+  alMetaOther: { en: 'Meta sent back an error (see the reply below).', hg: 'Meta ne error bheja (neeche reply dekho).', hi: 'Meta ने एक त्रुटि भेजी (नीचे जवाब देखें)।' },
   alMailOk: { en: 'Email service accepted it. The email should arrive shortly.', hg: 'Email service ne le liya. Email kuch der mein aayega.', hi: 'ईमेल सेवा ने ले लिया। ईमेल थोड़ी देर में आएगा।' },
   alOther: { en: 'Got an unexpected answer (see the reply below).', hg: 'Kuch alag jawab aaya (neeche reply dekho).', hi: 'कुछ अलग जवाब आया (नीचे जवाब देखें)।' },
   alReplyLbl: { en: 'Reply', hg: 'Jawab', hi: 'जवाब' },
@@ -405,12 +408,11 @@ var HI_DICT = {
   'Household': 'घर', 'Papa': 'पापा', 'Shreyansh': 'श्रेयांश', 'Shreya': 'श्रेया', 'Simba': 'सिंबा', 'Any status': 'कोई भी स्थिति', 'Open': 'खुला', 'Not checked': 'जाँच नहीं हुई', 'Checked': 'जाँचा गया', 'To pay back': 'लौटाना है', 'Locked': 'बंद', 'Removed': 'हटाई गई',
   'Entries': 'एंट्री', 'Top-up': 'टॉप-अप', '⬇ Excel': '⬇ एक्सेल', '⚙ Cost centres': '⚙ किसके लिए (सूची)', 'Charts': 'चार्ट', 'All time': 'शुरू से अब तक', 'Category': 'श्रेणी', 'Cost centre': 'किसके लिए', 'By category': 'श्रेणी अनुसार', 'By cost centre': 'किसके लिए अनुसार',
   'Month close': 'महीना बंद', 'closed months can only be corrected': 'बंद महीनों में सिर्फ़ सुधार हो सकता है', 'Report': 'रिपोर्ट', 'Close': 'बंद करें', 'Close month': 'महीना बंद करें', 'Month by month': 'महीनेवार', 'No past months yet.': 'अभी कोई पुराना महीना नहीं।',
-  'Money history': 'पैसे का इतिहास', 'Expense (fund)': 'खर्चा (फंड से)', 'Own-pocket expense': 'अपनी जेब से खर्चा', 'Paid back': 'लौटाया', 'Adjusted in top-up': 'टॉप-अप में एडजस्ट', 'Loan repaid': 'लोन चुकाया', 'Fund correction': 'फंड सुधार', 'Entry edited': 'एंट्री बदली', 'Entry removed': 'एंट्री हटाई', 'Correction': 'सुधार', 'Deleted (old app)': 'हटाई (पुराना ऐप)', 'Fund reduced (old)': 'फंड घटा (पुराना)', 'Reserve add (old)': 'रिज़र्व जुड़ा (पुराना)', 'Reserve reduced (old)': 'रिज़र्व घटा (पुराना)',
+  'Money history': 'पैसे का इतिहास', 'Entered by': 'किसने दर्ज किया', 'Everyone': 'सभी लोग','Expense (fund)': 'खर्चा (फंड से)', 'Own-pocket expense': 'अपनी जेब से खर्चा', 'Paid back': 'लौटाया', 'Adjusted in top-up': 'टॉप-अप में एडजस्ट', 'Loan repaid': 'लोन चुकाया', 'Fund correction': 'फंड सुधार', 'Entry edited': 'एंट्री बदली', 'Entry removed': 'एंट्री हटाई', 'Correction': 'सुधार', 'Deleted (old app)': 'हटाई (पुराना ऐप)', 'Fund reduced (old)': 'फंड घटा (पुराना)', 'Reserve add (old)': 'रिज़र्व जुड़ा (पुराना)', 'Reserve reduced (old)': 'रिज़र्व घटा (पुराना)',
   'Team': 'टीम', 'Remove…': 'हटाएँ…', 'Remove': 'हटाएँ', '🔑 Reset password': '🔑 पासवर्ड बदलें', 'Family code': 'परिवार कोड', 'Guest code': 'मेहमान कोड', '↻ New codes': '↻ नए कोड', 'Anyone who joins waits for your approval.': 'जो भी जुड़ेगा, आपकी मंज़ूरी का इंतज़ार करेगा।', 'Reject': 'मना करें', 'Approve as family': 'परिवार के सदस्य के रूप में मंज़ूर', 'Approve as guest': 'मेहमान के रूप में मंज़ूर',
-  'Settings': 'सेटिंग्स', 'HOUSEHOLD NAME': 'घर का नाम', 'MONTHLY STATEMENT EMAIL': 'मासिक स्टेटमेंट ईमेल', 'Save': 'सेव करें', '🔔 Low-fund alert': '🔔 फंड कम होने की सूचना', 'ALERT WHEN FUND BELOW ₹ (empty = off)': 'फंड इससे कम हो तो सूचना ₹ (खाली = बंद)',
-  'YOUR WHATSAPP NUMBER': 'आपका व्हाट्सऐप नंबर', 'CALLMEBOT API KEY': 'CALLMEBOT API की', 'Save alert': 'सूचना सेव करें', 'Send test': 'टेस्ट भेजें',
-  'One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message': 'एक बार व्हाट्सऐप सेटअप: callmebot.com पर दिया CallMeBot नंबर अपने कॉन्टैक्ट में सेव करें, उसे यह मैसेज भेजें',
-  ', and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.': ', और जवाब में आई API की यहाँ डालें। फंड सीमा से नीचे जाने पर एक व्हाट्सऐप + एक ईमेल आएगा; टॉप-अप के बाद फिर चालू हो जाता है।',
+  'Settings': 'सेटिंग्स', 'HOUSEHOLD NAME': 'घर का नाम', 'MONTHLY STATEMENT EMAIL': 'मासिक स्टेटमेंट ईमेल', 'Save': 'सेव करें', 'Email': 'ईमेल', '🔔 Low-fund alert': '🔔 फंड कम होने की सूचना', 'ALERT WHEN FUND BELOW ₹ (empty = off)': 'फंड इससे कम हो तो सूचना ₹ (खाली = बंद)',
+  'YOUR WHATSAPP NUMBER': 'आपका व्हाट्सऐप नंबर', 'Save alert': 'सूचना सेव करें', 'Send test': 'टेस्ट भेजें',
+  'Messages are sent through the official WhatsApp Business service. Enter the number with country code, for example +919876543210. You get one WhatsApp and one email when the fund drops below the limit; it re-arms after a top-up. Send test sends a sample message to check the setup.': 'संदेश व्हाट्सऐप की आधिकारिक बिज़नेस सेवा से जाते हैं। देश कोड के साथ नंबर डालें, जैसे +919876543210। फंड सीमा से नीचे जाने पर एक व्हाट्सऐप और एक ईमेल आएगा; टॉप-अप के बाद यह फिर चालू हो जाता है। "टेस्ट भेजें" दबाने पर सेटअप जाँचने के लिए नमूना संदेश जाएगा।',
   'Add new rate': 'नई दर जोड़ें', 'New rates apply from a date this month or later; past months never change.': 'नई दर इस महीने या आगे की तारीख से लगेगी; पुराने महीने कभी नहीं बदलते।',
   'Backup': 'बैकअप', 'auto on 1st & 16th': '1 और 16 तारीख को अपने-आप', '⚠️ No backup yet': '⚠️ अभी कोई बैकअप नहीं', '💾 Backup now': '💾 अभी बैकअप लें', '💬 Suggestions': '💬 सुझाव', 'Export': 'डाउनलोड',
   '⬇ Excel (everything)': '⬇ एक्सेल (सब कुछ)', '💾 JSON': '💾 JSON', 'Search…': 'खोजें…', 'e.g. 1234567': 'जैसे 1234567', '% / month': '% / महीना', 'Household name': 'घर का नाम',
@@ -613,10 +615,19 @@ function alertLine(lbl, x, isWa) {
   if (!x || !x.at) return box + name + ' <span class="muted">' + t('alNoTry') + '</span></div>';
   if (x.pending) return box + name + ' — <span class="muted">' + t('alWaiting') + '</span></div>';
   if (x.timeout) return box + name + ' — <span class="err">' + t('alTimeout') + '</span></div>';
-  var body = String(x.body || ''), good = x.code >= 200 && x.code < 300 && !/invalid|not|error|unregistered|fail/i.test(body), hint;
-  if (!good && isWa && /invalid|api ?key/i.test(body)) hint = t('alKeyBad');
-  else if (!good && isWa && /not.*(activ|registr)|unregistered|activate|not found/i.test(body)) hint = t('alNotAct');
-  else hint = good ? t(isWa ? 'alOk' : 'alMailOk') : t('alOther');
+  var body = String(x.body || ''), hint, good;
+  if (isWa) {
+    good = x.code >= 200 && x.code < 300 && /"messages"/.test(body);
+    if (good) hint = t('alOk');
+    else if (/\b132001\b|template/i.test(body)) hint = t('alTplMissing');
+    else if (/\b131030\b|allowed list|not allowed/i.test(body)) hint = t('alNotAllowed');
+    else if (/\b190\b|access token|oauth/i.test(body)) hint = t('alTokenBad');
+    else if (/secret/i.test(body)) hint = t('alSecret');
+    else hint = t('alMetaOther');
+  } else {
+    good = x.code >= 200 && x.code < 300 && !/invalid|not|error|unregistered|fail/i.test(body);
+    hint = good ? t('alMailOk') : t('alOther');
+  }
   return box + name + ' — <span class="' + (good ? 'okc' : 'err') + '">' + esc(hint) + '</span><div class="muted" style="word-break:break-word">' + esc(t('alReplyLbl')) + ': ' + esc(body.slice(0, 200) || 'HTTP ' + (x.code == null ? '—' : x.code)) + '</div></div>';
 }
 function alertReplyHtml() {
@@ -728,7 +739,7 @@ function viewOwner() {
   var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member">Mamta</option><option value="admin">Shrey</option><option value="guest">Guest</option></select>';
   return header(sel) + al +
     '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Owed to people</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>' + t('cashWithPeople') + '</span><b>₹' + money(advances()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
-    '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">' + t('loanRepay') + '</button><button class="btn sec" data-a="fundFix">' + t('fundFix') + '</button></div></div>' +
+    '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">' + t('loanRepay') + '</button><button class="btn sec" data-a="fundFix">' + t('fundFix') + '</button><button class="btn sec" data-a="cashCheck">💰 ' + t('cashCount') + '</button><button class="btn sec" data-a="report">📤 ' + t('sendReport') + '</button></div></div>' +
     insightsCard() + duesCard() + todoCard() + passbookCard(lb) + entriesCard() + ccCard() + chartsCard() + closeCard() + historyCard() + teamCard() + settingsCard() + backupsCard() + suggestionsCard() + exportCard();
 }
 
@@ -751,10 +762,17 @@ function passbookCard(lb) {
     '<div class="tablewrap" style="margin-top:10px"><table class="t"><tr><th>Month</th><th>Opening</th><th>+ Cash</th><th>+ Adjusted</th><th>+ Interest</th><th>− Repaid</th><th>Closing</th></tr>' + rows + '</table></div><div class="small muted">* this month so far (interest added at month end)</div>' +
     '<div class="actions" style="margin-top:10px"><button class="btn sec" data-a="settleStmt">📄 Settlement statement</button><button class="btn sec" data-a="passbookPdf">📄 Passbook PDF</button></div></div>';
 }
+/* "Entered by" filter, shared by All entries and Money history (Superuser screen) */
+function entryBy() { var v = ST.f.by; return (v && (v === 'ALL' || (ST.team || []).some(function (m) { return m.user_id === v; }))) ? v : 'ALL'; }
+function byField() {
+  var cur = entryBy();
+  var opts = '<option value="ALL"' + (cur === 'ALL' ? ' selected' : '') + '>Everyone</option>' + (ST.team || []).filter(function (m) { return m.role !== 'pending' && m.role !== 'guest'; }).map(function (m) { return '<option value="' + esc(m.user_id) + '"' + (m.user_id === cur ? ' selected' : '') + '>' + esc(m.display_name || '—') + '</option>'; }).join('');
+  return '<div class="field"><label>Entered by</label><select data-f="by">' + opts + '</select></div>';
+}
 function entriesCard() {
   var f = ST.f, months = uniq(ST.expenses.map(function (e) { return ym(e.expense_date); })).sort().reverse();
   var rows = ST.expenses.filter(function (e) {
-    if (f.m !== 'ALL' && ym(e.expense_date) !== f.m) return false; if (f.c !== 'ALL' && e.category !== f.c) return false;
+    if (entryBy() !== 'ALL' && e.user_id !== entryBy()) return false; if (f.m !== 'ALL' && ym(e.expense_date) !== f.m) return false; if (f.c !== 'ALL' && e.category !== f.c) return false;
     if (f.cc !== 'ALL' && !shares(e).some(function (s) { return s[0] === f.cc; })) return false;
     var st = entryStatus(e, ST.closes); if (f.s === 'unv' && !(live(e) && !e.verified_at)) return false; if (f.s !== 'ALL' && f.s !== 'unv' && st !== f.s) return false;
     if (f.q && (e.note + ' ' + catName(e.category) + ' ' + e.cost_centre).toLowerCase().indexOf(f.q.toLowerCase()) < 0) return false; return true;
@@ -763,7 +781,7 @@ function entriesCard() {
   return '<div class="card"><h2>All entries <small>' + rows.length + ' · ₹' + money(sumAmt(rows.filter(live))) + '</small></h2><div class="grid2"><div class="field"><input data-f="q" placeholder="Search…" value="' + esc(f.q) + '"></div>' +
     '<div class="field"><select data-f="m">' + opt('ALL', 'All months', f.m) + months.map(function (m) { return opt(m, monthName(m), f.m); }).join('') + '</select></div>' +
     '<div class="field"><select data-f="c">' + opt('ALL', 'All categories', f.c) + Object.keys(CATS).map(function (c) { return opt(c, catName(c), f.c); }).join('') + '</select></div>' +
-    '<div class="field"><select data-f="cc">' + opt('ALL', 'All cost centres', f.cc) + ccList().map(function (c) { return opt(c, c, f.cc); }).join('') + '</select></div>' +
+    '<div class="field"><select data-f="cc">' + opt('ALL', 'All cost centres', f.cc) + ccList().map(function (c) { return opt(c, c, f.cc); }).join('') + '</select></div>' + byField() +
     '<div class="field full"><select data-f="s">' + [['ALL', 'Any status'], ['open', 'Open'], ['unv', 'Not checked'], ['ver', 'Checked'], ['due', 'To pay back'], ['lock', 'Locked'], ['rem', 'Removed']].map(function (x) { return opt(x[0], x[1], f.s); }).join('') + '</select></div></div>' +
     '<div class="list">' + listWithMore('all', rows, entryRow) + '</div></div>';
 }
@@ -815,8 +833,10 @@ function closeCard() {
 }
 var TX_LBL = { fund_add: 'Top-up', expense: 'Expense (fund)', own_pocket: 'Own-pocket expense', settlement: 'Paid back', loan_adjust: 'Adjusted in top-up', loan_repay: 'Loan repaid', fund_correction: 'Fund correction', expense_edit: 'Entry edited', expense_removed: 'Entry removed', correction: 'Correction', expense_deleted: 'Deleted (old app)', fund_remove: 'Fund reduced (old)', reserve_add: 'Reserve add (old)', reserve_remove: 'Reserve reduced (old)' };
 function historyCard() {
-  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); return '<div class="it" style="cursor:default"><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(noteTx(x.note)) + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
-  return '<div class="card"><h2>Money history</h2><div class="list">' + listWithMore('tx', ST.txs, row) + '</div></div>';
+  var ids = {}; ST.expenses.forEach(function (e) { ids[e.id] = 1; });
+  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); var link = (x.ref_id && ids[x.ref_id]) ? ' data-a="detail" data-id="' + esc(x.ref_id) + '" style="cursor:pointer"' : ' style="cursor:default"'; return '<div class="it"' + link + '><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(noteTx(x.note)) + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
+  var by = entryBy(), rows = ST.txs.filter(function (x) { return by === 'ALL' || x.user_id === by; });
+  return '<div class="card"><h2>Money history<small> ' + rows.length + '</small></h2>' + byField() + '<div class="list">' + listWithMore('tx', rows, row) + '</div></div>';
 }
 function teamCard() {
   var mine = R() === 'owner';
@@ -833,7 +853,7 @@ function teamCard() {
 function settingsCard() {
   var rates = (ST.hh.loan_rates || []).map(function (r) { return 'from ' + r.from + ': ' + r.rate + '%'; }).join(' · ');
   return '<div class="card"><h2>Settings</h2><div class="grid2"><div class="field"><label>HOUSEHOLD NAME</label><input id="setName" value="' + esc(ST.hh.name) + '"></div><div class="field"><label>MONTHLY STATEMENT EMAIL</label><input id="setEmail" type="email" value="' + esc(ST.hh.report_email || '') + '"></div></div><button class="btn sec" data-a="saveSettings">Save</button>' +
-    '<h3 style="margin:16px 0 6px;font-size:15px;color:var(--dark)">🔔 Low-fund alert</h3><div class="grid2"><div class="field"><label>ALERT WHEN FUND BELOW ₹ (empty = off)</label><input id="alThr" type="number" inputmode="decimal" value="' + (ST.alert && ST.alert.threshold != null ? ST.alert.threshold : '') + '"></div><div class="field"><label>YOUR WHATSAPP NUMBER</label><input id="alPhone" type="tel" placeholder="+919876543210" value="' + esc((ST.alert && ST.alert.wa_phone) || '') + '"></div><div class="field full"><label>CALLMEBOT API KEY ' + (ST.alert && ST.alert.wa_key_set ? '(saved ✓ — leave empty to keep)' : '') + '</label><input id="alKey" placeholder="' + (ST.alert && ST.alert.wa_key_set ? '••••••' : 'e.g. 1234567') + '"></div></div><div class="actions"><button class="btn sec" data-a="saveAlert">Save alert</button><button class="btn sec" data-a="testAlert">Send test</button></div>' + alertReplyHtml() + '<div class="small muted" style="margin-top:6px">One-time WhatsApp setup: save the CallMeBot number shown on callmebot.com in your contacts, send it the message <b>I allow callmebot to send me messages</b>, and paste the API key it replies with. You get one WhatsApp + one email when the fund drops below the limit; it re-arms after a top-up.</div>' +
+    '<h3 style="margin:16px 0 6px;font-size:15px;color:var(--dark)">🔔 Low-fund alert</h3><div class="grid2"><div class="field"><label>ALERT WHEN FUND BELOW ₹ (empty = off)</label><input id="alThr" type="number" inputmode="decimal" value="' + (ST.alert && ST.alert.threshold != null ? ST.alert.threshold : '') + '"></div><div class="field"><label>YOUR WHATSAPP NUMBER</label><input id="alPhone" type="tel" placeholder="+919876543210" value="' + esc((ST.alert && ST.alert.wa_phone) || '') + '"></div></div><div class="actions"><button class="btn sec" data-a="saveAlert">Save alert</button><button class="btn sec" data-a="testAlert">Send test</button></div>' + alertReplyHtml() + '<div class="small muted" style="margin-top:6px">Messages are sent through the official WhatsApp Business service. Enter the number with country code, for example +919876543210. You get one WhatsApp and one email when the fund drops below the limit; it re-arms after a top-up. Send test sends a sample message to check the setup.</div>' +
     '<div style="margin-top:12px" class="small">Loan rate: ' + esc(rates) + '</div><div class="row" style="margin-top:6px"><input id="rateFrom" type="date" value="' + (nextMonth(cm()) + '-01') + '" style="padding:7px"><input id="rateVal" type="number" step="0.05" min="0" max="10" placeholder="% / month" style="padding:7px;width:110px"><button class="btn sec mini" data-a="addRate">Add new rate</button></div><div class="small muted">New rates apply from a date this month or later; past months never change.</div></div>';
 }
 function backupsCard() {
@@ -1160,7 +1180,7 @@ var A = {
   regen: async function () { if (!(await confirmBox('Make new family and guest codes? Old codes stop working.', 'Yes'))) return; var r = await rpc('regen_codes', { p_household: ST.hh.id }); toast('New codes: ' + r.join_code + ' / ' + r.guest_code); await refresh(); },
   saveSettings: async function () { await rpc('update_household', { p_household: ST.hh.id, p_name: $('setName').value.trim(), p_report_email: $('setEmail').value.trim() }); toast('Saved'); await refresh(); },
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
-  saveAlert: async function () { var v = $('alThr').value.trim(); var r = await rpc('set_fund_alert', { p_household: ST.hh.id, p_threshold: v === '' ? null : Number(v), p_phone: $('alPhone').value.trim() || null, p_apikey: $('alKey').value.trim() || null }); toast(r.sent_now ? 'Saved — fund is already below the limit, alert sent' : 'Alert saved'); await refresh(); },
+  saveAlert: async function () { var v = $('alThr').value.trim(); var r = await rpc('set_fund_alert', { p_household: ST.hh.id, p_threshold: v === '' ? null : Number(v), p_phone: $('alPhone').value.trim() || null }); toast(r.sent_now ? 'Saved — fund is already below the limit, alert sent' : 'Alert saved'); await refresh(); },
   testAlert: async function () { await rpc('test_fund_alert', { p_household: ST.hh.id }); toast(t('alTestSent')); },
   ccEdit: async function () { var v = prompt('Cost centres (comma separated):', ccList().join(', ')); if (v === null) return; var list = uniq(v.split(',').map(function (x) { return x.trim(); })); if (list.indexOf('Household') < 0) list.unshift('Household'); await rpc('set_cost_centres', { p_household: ST.hh.id, p_list: list }); await refresh(); }
 };
