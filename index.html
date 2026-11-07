@@ -69,7 +69,7 @@ input.date-big{font-size:22px!important;font-weight:700;text-align:center;paddin
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v15 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15.3 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -149,6 +149,8 @@ var T = {
   viewOnly: { en: 'View only', hg: 'Sirf dekhne ke liye', hi: 'सिर्फ़ देखने के लिए' },
   photoTip: { en: 'Tap photo to zoom', hg: 'Photo dabao — bada hoga', hi: 'फ़ोटो दबाएँ — बड़ी होगी' },
   settleSelf: { en: 'Pay myself back', hg: 'Khud ko wapas', hi: 'खुद को वापस' },
+  selfNote: { en: 'The other Superuser records this', hg: 'Dusra Superuser ye entry karega', hi: 'दूसरा सुपरयूज़र यह दर्ज करेगा' },
+  selfNoteMember: { en: 'A Superuser records this', hg: 'Koi Superuser ye entry karega', hi: 'कोई सुपरयूज़र यह दर्ज करेगा' },
   entries: { en: 'entries', hg: 'entry', hi: 'खर्चे' },
   advWith: { en: 'advance with {p}', hg: '{p} ke paas advance', hi: '{p} के पास एडवांस' },
   oweTo: { en: 'House owes {p}', hg: '{p} ko dena hai', hi: '{p} को देना है' },
@@ -566,6 +568,11 @@ function cm() { return today().slice(0, 7); }
 function payers() { return (ST.hh && ST.hh.payers) || ['Mamta', 'Shreyansh', 'Shrey']; }
 function ccList() { return (ST.hh && ST.hh.cost_centres && ST.hh.cost_centres.length) ? ST.hh.cost_centres : ['Household', 'Mamta', 'Papa', 'Shreyansh', 'Shrey', 'Shreya', 'Simba']; }
 function myName() { return (ST.status && ST.status.display_name) || (ST.user && ST.user.user_metadata && ST.user.user_metadata.name) || ''; }
+function myPayerKey() {
+  var nm = ST.viewAs ? (ST.viewName || '') : ((ST.status && ST.status.display_name) || '');
+  var first = String(nm || '').trim().split(' ')[0].toLowerCase();
+  return first ? (payers().filter(function (p) { return p.toLowerCase() === first; })[0] || null) : null;
+}
 function unverified() { return ST.expenses.filter(function (e) { return live(e) && !e.verified_at && (e.entry_kind || 'normal') === 'normal'; }); }
 function pendingApprovals() { return ST.settlements.filter(function (s) { return s.needs_approval && !s.approved_at; }); }
 function lastCheck() { return ST.checks[0] || null; }
@@ -603,10 +610,10 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else if (!ST.user) v = viewLogin();
   else if (!ST.status) v = viewNoHouse();
   else if (ST.role === 'pending') v = viewPending();
-  else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
+  else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + (ST.viewName ? ' · ' + ST.viewName : '') + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
-  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15 · cloud synced'; hiWalk(ft); }
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.3 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function alertLine(lbl, x, isWa) {
@@ -667,11 +674,11 @@ function recentCard(title) {
 }
 function balLine(p, b) { return b === 0 ? t('settled0') : b < 0 ? t('oweTo', { p: pName(p) }) + ' ₹' + money(-b) : t('advWith', { p: pName(p) }) + ' ₹' + money(b); }
 function duesCard() {
-  var b = bals(), keys = payers().filter(function (p) { return b[p]; }), canAct = role() !== 'guest';
+  var b = bals(), keys = payers().filter(function (p) { return b[p]; }), canAct = role() !== 'guest', me = myPayerKey();
   var h = keys.map(function (p) {
-    var v = b[p].bal, col = v < 0 ? '#842029' : v > 0 ? '#21405f' : '#2d5a27';
+    var v = b[p].bal, col = v < 0 ? '#842029' : v > 0 ? '#21405f' : '#2d5a27', own = canAct && p === me;
     return '<div class="it" style="cursor:default;flex-wrap:wrap"><div class="ic">💵</div><div class="tx"><b>' + esc(pName(p)) + '</b><small style="color:' + col + ';font-size:14px">' + esc(balLine(p, v)) + '</small></div>' +
-      (canAct ? '<div class="row"><button class="btn green mini" data-a="pay" data-p="' + esc(p) + '">' + t('give') + '</button>' + (v > 0 ? '<button class="btn sec mini" data-a="giveBack" data-p="' + esc(p) + '">' + t('gotBack') + '</button>' : '') + '</div>' : '') + '</div>';
+      (own ? '<div class="row"><small class="muted">' + t(role() === 'member' ? 'selfNoteMember' : 'selfNote') + '</small></div>' : canAct ? '<div class="row"><button class="btn green mini" data-a="pay" data-p="' + esc(p) + '">' + t('give') + '</button>' + (v > 0 ? '<button class="btn sec mini" data-a="giveBack" data-p="' + esc(p) + '">' + t('gotBack') + '</button>' : '') + '</div>' : '') + '</div>';
   }).join('');
   var appr = pendingApprovals(); if (appr.length) h += '<div class="small muted" style="margin-top:6px">⏳ ' + t('awaitingShrey') + ': ' + appr.map(function (s) { return '₹' + money(s.amount); }).join(', ') + '</div>';
   return '<div class="card"><h2>' + t('accounts') + '</h2><div class="list">' + h + '</div></div>';
@@ -736,7 +743,7 @@ function viewOwner() {
   if (u.some(function (e) { return daysBetween(e.expense_date, today()) > 15; })) al += '<div class="banner org">🔎 Some of Mamta\'s entries are unchecked for 15+ days (' + u.length + ' total).</div>';
   if (a.length) al += '<div class="banner org">🧾 ' + a.length + ' self-settlement(s) waiting for Shrey.</div>';
   var lc = lastCheck(); if (lc && Number(lc.diff) !== 0) al += '<div class="banner red">💰 Last cash count (' + prettyDate(lc.check_date) + ') differs by ₹' + money(lc.diff) + '.</div>';
-  var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member">Mamta</option><option value="admin">Shrey</option><option value="guest">Guest</option></select>';
+  var sel = '<select data-a="viewAsSel" style="padding:5px;border-radius:6px"><option value="">View as…</option><option value="member|Mamta">Mamta (member)</option><option value="owner|Shrey">Shrey (Superuser)</option><option value="owner|Shreyansh">Shreyansh (Superuser)</option><option value="guest|">Guest</option></select>';
   return header(sel) + al +
     '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Owed to people</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>' + t('cashWithPeople') + '</span><b>₹' + money(advances()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
     '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">' + t('loanRepay') + '</button><button class="btn sec" data-a="fundFix">' + t('fundFix') + '</button><button class="btn sec" data-a="cashCheck">💰 ' + t('cashCount') + '</button><button class="btn sec" data-a="report">📤 ' + t('sendReport') + '</button></div></div>' +
@@ -834,7 +841,7 @@ function closeCard() {
 var TX_LBL = { fund_add: 'Top-up', expense: 'Expense (fund)', own_pocket: 'Own-pocket expense', settlement: 'Paid back', loan_adjust: 'Adjusted in top-up', loan_repay: 'Loan repaid', fund_correction: 'Fund correction', expense_edit: 'Entry edited', expense_removed: 'Entry removed', correction: 'Correction', expense_deleted: 'Deleted (old app)', fund_remove: 'Fund reduced (old)', reserve_add: 'Reserve add (old)', reserve_remove: 'Reserve reduced (old)' };
 function historyCard() {
   var ids = {}; ST.expenses.forEach(function (e) { ids[e.id] = 1; });
-  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); var link = (x.ref_id && ids[x.ref_id]) ? ' data-a="detail" data-id="' + esc(x.ref_id) + '" style="cursor:pointer"' : ' style="cursor:default"'; return '<div class="it"' + link + '><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(noteTx(x.note)) + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
+  var row = function (x) { var d = Number(x.balance_after) - Number(x.balance_before); var editable = x.type === 'fund_add' && canEditTopup(); var link = editable ? ' data-a="editTopup" data-id="' + esc(x.id) + '" style="cursor:pointer"' : (x.ref_id && ids[x.ref_id]) ? ' data-a="detail" data-id="' + esc(x.ref_id) + '" style="cursor:pointer"' : ' style="cursor:default"'; return '<div class="it"' + link + '><div class="tx"><b>' + (TX_LBL[x.type] || x.type) + (x.source && x.type !== 'expense' ? ' · ' + esc(x.source) : '') + '</b><small>' + prettyDate(x.transaction_date) + ' · ' + esc(noteTx(x.note)) + (editable ? ' · ✎ tap to edit' : '') + '</small></div><div class="am">' + (d > 0 ? '+' : d < 0 ? '−' : '') + '₹' + money(x.amount) + '<div class="small muted">' + money(x.balance_before) + ' → ' + money(x.balance_after) + '</div></div></div>'; };
   var by = entryBy(), rows = ST.txs.filter(function (x) { return by === 'ALL' || x.user_id === by; });
   return '<div class="card"><h2>Money history<small> ' + rows.length + '</small></h2>' + byField() + '<div class="list">' + listWithMore('tx', rows, row) + '</div></div>';
 }
@@ -1026,9 +1033,11 @@ function topupModal() {
     '<div class="field"><label>SOURCE</label><select id="tuSrc"><option value="shreyansh">Shreyansh (loan, ' + rateOn(ST.hh.loan_rates, today()) + '%/month)</option><option value="business">Business income (not a loan)</option></select></div>' +
     '<div class="field"><label>' + t('date') + '</label><input id="tuDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="tuNote"></div>' +
     (owedS > 0 ? '<div class="field"><label>ADJUST WHAT THE HOUSE OWES SHREYANSH (₹' + money(owedS) + ') — added to loan, no cash moves</label><input id="tuAdj" type="number" inputmode="decimal" value="' + owedS + '"></div>' : '') +
-    '<button class="btn huge green" id="tuGo">' + t('save') + '</button>');
+    '<div id="tuPrev" class="small" style="margin:4px 0 10px"></div><button class="btn huge green" id="tuGo">' + t('save') + '</button>');
   if ($('tuCount')) $('tuCount').onclick = function () { cashCheckModal('topup'); };
-  $('tuGo').onclick = guard(async function () { var adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0, a = Number($('tuAmt').value) || 0; if (!(a > 0) && !(adj > 0)) return toast(t('amountBad'), true); busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_amount: adj }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
+  var tuPrev = function () { var a = Number($('tuAmt').value) || 0, adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0; $('tuPrev').innerHTML = (a > 0 || adj > 0) ? 'Fund ' + (a > 0 ? '<b>+₹' + money(a) + '</b> (cash in)' : 'no change (no cash)') + (adj > 0 ? ' · Loan <b>+₹' + money(adj) + '</b> (adjusted, no cash)' : '') : ''; };
+  $('tuAmt').oninput = tuPrev; if ($('tuAdj')) $('tuAdj').oninput = tuPrev; tuPrev();
+  $('tuGo').onclick = guard(async function () { var adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0, a = Number($('tuAmt').value) || 0; if (!(a > 0) && !(adj > 0)) return toast(t('amountBad'), true); if (a > 0 && adj > 0 && !window.confirm('Cash ₹' + money(a) + ' goes INTO the fund, and ₹' + money(adj) + ' is also added to the loan (no cash).\n\nIf no cash was actually handed over, press Cancel, clear the CASH field and save again.')) return; busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_amount: adj }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
 }
 function repayModal() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today());
@@ -1038,6 +1047,34 @@ function repayModal() {
 function fundFixModal() {
   openModal(sheetHead(t('fundFix')) + '<p class="small muted">Use only to fix a mistake in the fund balance. Normal spending goes through expenses; repayments through Loan repayment.</p><div class="field"><label>CHANGE ₹ (use − to reduce)</label><input id="fxAmt" type="number" inputmode="decimal" placeholder="-500"></div><div class="field"><label>REASON (required)</label><input id="fxReason"></div><label class="row small"><input type="checkbox" id="fxLoan"> This fixes a wrongly entered top-up (also changes the loan)</label><button class="btn huge" id="fxGo" style="margin-top:10px">Save</button>');
   $('fxGo').onclick = guard(async function () { await rpc('fund_correct', { p_household: ST.hh.id, p_delta: Number($('fxAmt').value), p_reason: $('fxReason').value.trim(), p_loan: $('fxLoan').checked }); closeModal(); toast('Saved'); await refresh(); });
+}
+function canEditTopup() { return !ST.viewAs && ST.role === 'owner'; }
+function topupEditModal(x) {
+  var fixes = ST.txs.filter(function (r) { return r.type === 'fund_correction' && r.ref_id === x.id; });
+  var cur = Number(x.amount) + fixes.reduce(function (a, r) { return a + (Number(r.balance_after) - Number(r.balance_before)); }, 0);
+  var fromShreyansh = (x.source || 'shreyansh') === 'shreyansh';
+  var sig = function (d) { return (d > 0 ? '+' : '−') + '₹' + money(Math.abs(d)); };
+  var newAmt = function () { return $('etAmt').value === '' ? NaN : Number($('etAmt').value); };
+  openModal(sheetHead('✎ Edit top-up') +
+    '<p class="small muted">Top-up of ' + esc(prettyDate(x.transaction_date)) + ' · ' + (fromShreyansh ? 'from Shreyansh (loan)' : 'business income (not a loan)') + (x.note ? ' · ' + esc(noteTx(x.note)) : '') + '</p>' +
+    '<p>Cash in this top-up now: <b>₹' + money(cur) + '</b>' + (fixes.length ? ' <small class="muted">(after ' + fixes.length + ' earlier edit' + (fixes.length > 1 ? 's' : '') + ')</small>' : '') + '</p>' +
+    '<p class="small muted">The original entry stays in Money history. The change is recorded as a Fund correction with your reason. Only the cash part changes; any ADJUST amount on this top-up stays as it is.</p>' +
+    '<div class="field"><label>CORRECT CASH ₹ (type 0 if no cash came in)</label><input id="etAmt" class="amount-big" type="number" inputmode="decimal" value="' + cur + '"></div>' +
+    '<div class="field"><label>REASON (required)</label><input id="etReason" placeholder="e.g. settled from my pocket, no cash came in"></div>' +
+    '<div id="etPrev" class="small" style="margin:4px 0 10px"></div>' +
+    '<button class="btn huge" id="etGo">' + t('save') + '</button>');
+  var etPrev = function () { var n = newAmt(), d = n - cur; $('etPrev').innerHTML = !(n >= 0) ? '<span class="err">Enter the correct cash amount (0 or more).</span>' : Math.abs(d) < 0.005 ? 'No change yet.' : 'Fund <b>' + sig(d) + '</b> (₹' + money(fund()) + ' → ₹' + money(fund() + d) + ')' + (fromShreyansh ? ' · Loan <b>' + sig(d) + '</b>' : ' · Loan: no change'); };
+  $('etAmt').oninput = etPrev; etPrev();
+  $('etGo').onclick = guard(async function () {
+    var n = newAmt(), reason = $('etReason').value.trim(), d = n - cur;
+    if (!(n >= 0)) return toast('Enter the correct cash amount (0 or more).', true);
+    if (!reason) return toast('Reason is required.', true);
+    if (Math.abs(d) < 0.005) return toast('No change: this top-up is already ₹' + money(cur), true);
+    if (!window.confirm('Change the cash of this top-up from ₹' + money(cur) + ' to ₹' + money(n) + '?\n\nFund goes ' + (d > 0 ? 'UP' : 'DOWN') + ' by ₹' + money(Math.abs(d)) + (fromShreyansh ? ', and the loan changes by the same amount.' : '.'))) return;
+    busy($('etGo'), true);
+    try { await rpc('edit_topup', { p_household: ST.hh.id, p_transaction: x.id, p_new_amount: n, p_reason: reason }); } catch (e) { busy($('etGo'), false); throw e; }
+    closeModal(); toast(t('saved')); await refresh();
+  });
 }
 function correctModal(id) {
   var e = ST.expenses.filter(function (x) { return x.id === id; })[0]; if (!e) return; var cat = e.category;
@@ -1147,7 +1184,7 @@ var A = {
   join: async function () { var c = $('joinCode').value.trim(); if (!c) return; await rpc('join_household', { p_code: c }); await refresh(); },
   createHouse: async function () { await rpc('create_household', { p_name: $('houseName').value.trim() || 'Ghar' }); await refresh(); },
   lang: async function (el) { LANG = el.dataset.v; render(); if (!ST.viewAs) rpc('set_my_lang', { p_household: ST.hh.id, p_lang: LANG }).catch(function () { }); },
-  viewAs: function (el) { ST.viewAs = el.dataset.v || null; LANG = ST.viewAs ? DEF_LANG[ST.viewAs] : (ST.status.lang || DEF_LANG[ST.role]); render(); window.scrollTo(0, 0); },
+  viewAs: function (el) { ST.viewAs = el.dataset.v || null; ST.viewName = el.dataset.n || null; LANG = ST.viewAs ? DEF_LANG[ST.viewAs] : (ST.status.lang || DEF_LANG[ST.role]); render(); window.scrollTo(0, 0); },
   more: function (el) { ST.more[el.dataset.k] = !ST.more[el.dataset.k]; render(); },
   addExp: function () { expenseForm(null); },
   detail: function (el) { detail(el.dataset.id); },
@@ -1162,7 +1199,7 @@ var A = {
   approveOne: async function (el) { await rpc('approve_settlement', { p_id: el.dataset.id }); closeModal(); await refresh(); toast('✓'); },
   settle: function (el) { payModal(el.dataset.p); }, pay: function (el) { payModal(el.dataset.p); }, giveBack: function (el) { returnModal(el.dataset.p); },
   size: function (el) { lsSet('gk-size', el.dataset.v); applySize(); },
-  cashCheck: cashCheckModal, topup: topupModal, repay: repayModal, fundFix: fundFixModal, report: supervisorReport, passbookRO: passbookRO,
+  cashCheck: cashCheckModal, topup: topupModal, repay: repayModal, fundFix: fundFixModal, editTopup: function (el) { var x = ST.txs.filter(function (r) { return r.id === el.dataset.id && r.type === 'fund_add'; })[0]; if (x && canEditTopup()) topupEditModal(x); }, report: supervisorReport, passbookRO: passbookRO,
   stPdf: statementPdf, stXls: statementXls, stWa: statementWa, xlsAll: xlsAll,
   jsonAll: function () { download('ghar-kharcha-' + today() + '.json', JSON.stringify({ app: 'ghar-kharcha-online', version: 14, exportedAt: new Date().toISOString(), household: ST.hh, wallet: ST.wallet, expenses: ST.expenses, transactions: ST.txs, settlements: ST.settlements, month_closes: ST.closes, cash_checks: ST.checks }, null, 1)); },
   settleStmt: function () { var d = prompt('Settlement statement as on date (YYYY-MM-DD):', today()); if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) passbookPdf(d, true); },
@@ -1193,7 +1230,7 @@ document.addEventListener('change', function (ev) {
   if (el.dataset.f) { ST.f[el.dataset.f] = el.value; render(); return; }
   var a = el.dataset.a;
   if (a === 'stM') { ST.stM = el.value; render(); } else if (a === 'stC') { ST.stC = el.value; render(); } else if (a === 'chP') { ST.chP = el.value; render(); }
-  else if (a === 'viewAsSel') { A.viewAs({ dataset: { v: el.value } }); }
+  else if (a === 'viewAsSel') { var vp = String(el.value).split('|'); A.viewAs({ dataset: { v: vp[0], n: vp[1] } }); }
   else if (a === 'roleSel') { guard(A.setRole)({ dataset: { u: el.dataset.u, r: el.value } }); }
 });
 document.addEventListener('input', function (ev) { var el = ev.target; if (el.dataset.f === 'q') { ST.f.q = el.value; clearTimeout(ST._qt); ST._qt = setTimeout(function () { render(); var i = document.querySelector('[data-f="q"]'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 350); } });
