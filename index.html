@@ -69,7 +69,7 @@ input.date-big{font-size:22px!important;font-weight:700;text-align:center;paddin
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v15.3 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15.4 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -613,7 +613,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + (ST.viewName ? ' · ' + ST.viewName : '') + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
-  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.3 · cloud synced'; hiWalk(ft); }
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.4 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function alertLine(lbl, x, isWa) {
@@ -1059,15 +1059,19 @@ function topupEditModal(x) {
     '<p class="small muted">Top-up of ' + esc(prettyDate(x.transaction_date)) + ' · ' + (fromShreyansh ? 'from Shreyansh (loan)' : 'business income (not a loan)') + (x.note ? ' · ' + esc(noteTx(x.note)) : '') + '</p>' +
     '<p>Cash in this top-up now: <b>₹' + money(cur) + '</b>' + (fixes.length ? ' <small class="muted">(after ' + fixes.length + ' earlier edit' + (fixes.length > 1 ? 's' : '') + ')</small>' : '') + '</p>' +
     '<p class="small muted">The original entry stays in Money history. The change is recorded as a Fund correction with your reason. Only the cash part changes; any ADJUST amount on this top-up stays as it is.</p>' +
-    '<div class="field"><label>CORRECT CASH ₹ (type 0 if no cash came in)</label><input id="etAmt" class="amount-big" type="number" inputmode="decimal" value="' + cur + '"></div>' +
+    '<div class="field"><label>CORRECT CASH ₹ (what actually came in)</label><input id="etAmt" class="amount-big" type="number" inputmode="decimal" value="' + cur + '"><button class="btn sec" id="etZero" type="button" style="margin-top:8px;width:100%">No cash came in → set to 0</button></div>' +
     '<div class="field"><label>REASON (required)</label><input id="etReason" placeholder="e.g. settled from my pocket, no cash came in"></div>' +
     '<div id="etPrev" class="small" style="margin:4px 0 10px"></div>' +
     '<button class="btn huge" id="etGo">' + t('save') + '</button>');
-  var etPrev = function () { var n = newAmt(), d = n - cur; $('etPrev').innerHTML = !(n >= 0) ? '<span class="err">Enter the correct cash amount (0 or more).</span>' : Math.abs(d) < 0.005 ? 'No change yet.' : 'Fund <b>' + sig(d) + '</b> (₹' + money(fund()) + ' → ₹' + money(fund() + d) + ')' + (fromShreyansh ? ' · Loan <b>' + sig(d) + '</b>' : ' · Loan: no change'); };
-  $('etAmt').oninput = etPrev; etPrev();
+  var etPrev = function () { var n = newAmt(), d = n - cur; $('etPrev').innerHTML = isNaN(n) ? '<span class="err">The cash box is empty. Type the amount, or 0 if no cash came in.</span>' : n < 0 ? '<span class="err">Cash cannot be negative.</span>' : Math.abs(d) < 0.005 ? 'No change yet.' : 'Fund <b>' + sig(d) + '</b> (₹' + money(fund()) + ' → ₹' + money(fund() + d) + ')' + (fromShreyansh ? ' · Loan <b>' + sig(d) + '</b>' : ' · Loan: no change'); };
+  $('etAmt').oninput = etPrev;
+  $('etAmt').onfocus = function () { try { this.select(); } catch (e) { } };
+  $('etZero').onclick = function () { $('etAmt').value = '0'; etPrev(); };
+  etPrev();
   $('etGo').onclick = guard(async function () {
     var n = newAmt(), reason = $('etReason').value.trim(), d = n - cur;
-    if (!(n >= 0)) return toast('Enter the correct cash amount (0 or more).', true);
+    if (isNaN(n)) return toast('The cash box is empty. Type the amount, or 0 if no cash came in.', true);
+    if (n < 0) return toast('Cash cannot be negative.', true);
     if (!reason) return toast('Reason is required.', true);
     if (Math.abs(d) < 0.005) return toast('No change: this top-up is already ₹' + money(cur), true);
     if (!window.confirm('Change the cash of this top-up from ₹' + money(cur) + ' to ₹' + money(n) + '?\n\nFund goes ' + (d > 0 ? 'UP' : 'DOWN') + ' by ₹' + money(Math.abs(d)) + (fromShreyansh ? ', and the loan changes by the same amount.' : '.'))) return;
