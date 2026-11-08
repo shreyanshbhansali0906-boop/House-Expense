@@ -69,7 +69,7 @@ input.date-big{font-size:22px!important;font-weight:700;text-align:center;paddin
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v15.4 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15.5 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -613,7 +613,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + (ST.viewName ? ' · ' + ST.viewName : '') + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
-  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.4 · cloud synced'; hiWalk(ft); }
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.5 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function alertLine(lbl, x, isWa) {
@@ -1025,19 +1025,104 @@ function cashCheckModal(from) { var after = from === 'topup' ? topupModal : null
   $('ccGo').onclick = guard(async function () { if ($('ccCount').value === '') return; await rpc('cash_check', { p_household: ST.hh.id, p_counted: Number($('ccCount').value), p_note: $('ccNote').value.trim() }); closeModal(); toast(t('saved')); await refresh(); if (after) after(); });
 }
 function topupModal() {
-  var owedS = Math.max(0, -((bals()['Shreyansh'] || { bal: 0 }).bal)), n = nextCashInfo(ST.expenses, ST.txs, fund(), dues());
+  var owedS = Math.max(0, -((bals()['Shreyansh'] || { bal: 0 }).bal));
   var lcT = lastCheck(), ageT = lcT ? daysBetween(lcT.check_date, today()) : null;
   var countFirst = (ageT === null || ageT > 1) ? '<div class="banner org" style="margin-bottom:10px">💰 ' + t('countFirst') + (lcT ? ' <small>(' + t('cashCheckOk', { d: ageT }) + ')</small>' : '') + '<div style="margin-top:6px"><button class="btn mini" id="tuCount">💰 ' + t('cashCount') + '</button></div></div>' : '';
+  var srcOpts = function (dueOn) { return '<option value="shreyansh">Shreyansh (loan, ' + rateOn(ST.hh.loan_rates, today()) + '%/month)</option>' + (dueOn ? '' : '<option value="business">Business income (not a loan)</option>'); };
+  // Shreyansh's own unmarked entries, oldest first. Entries in closed months cannot be marked here.
+  var pend = ST.expenses.filter(function (e) { return isPending(e) && e.paid_by === 'Shreyansh' && !isClosed(ST.closes, e.expense_date); }).sort(function (p, q) {
+    if (p.expense_date !== q.expense_date) return p.expense_date < q.expense_date ? -1 : 1;
+    return String(p.created_at) < String(q.created_at) ? -1 : String(p.created_at) > String(q.created_at) ? 1 : 0;
+  });
+  var unmarkedAll = ST.expenses.filter(function (e) { return isPending(e) && e.paid_by === 'Shreyansh'; }).reduce(function (a, e) { return a + Number(e.amount); }, 0);
+  var legacyGap = owedS > 0 && Math.abs(unmarkedAll - owedS) >= 0.005;
   openModal(sheetHead(t('addTopup')) + countFirst + '<p class="small muted">Fund ₹' + money(fund()) + (ST.hh.low_fund_threshold != null ? ' · limit ₹' + money(ST.hh.low_fund_threshold) : '') + ' · dues ₹' + money(dues()) + '</p>' +
-    '<div class="field"><label>CASH GIVEN TO MUMMY ₹</label><input id="tuAmt" class="amount-big" type="number" inputmode="decimal"></div>' +
-    '<div class="field"><label>SOURCE</label><select id="tuSrc"><option value="shreyansh">Shreyansh (loan, ' + rateOn(ST.hh.loan_rates, today()) + '%/month)</option><option value="business">Business income (not a loan)</option></select></div>' +
+    '<div class="field"><label>CASH HANDED TO MAMTA ₹ (goes into the fund)</label><input id="tuAmt" class="amount-big" type="number" inputmode="decimal"></div>' +
+    '<div class="field"><label>SOURCE</label><select id="tuSrc">' + srcOpts(false) + '</select></div>' +
     '<div class="field"><label>' + t('date') + '</label><input id="tuDate" type="date" max="' + today() + '" value="' + today() + '"></div><div class="field"><label>NOTE</label><input id="tuNote"></div>' +
-    (owedS > 0 ? '<div class="field"><label>ADJUST WHAT THE HOUSE OWES SHREYANSH (₹' + money(owedS) + ') — added to loan, no cash moves</label><input id="tuAdj" type="number" inputmode="decimal" value="' + owedS + '"></div>' : '') +
-    '<div id="tuPrev" class="small" style="margin:4px 0 10px"></div><button class="btn huge green" id="tuGo">' + t('save') + '</button>');
+    (owedS > 0 ? '<div class="field"><label>CLEAR DUES OWED TO SHREYANSH ₹ (no cash)</label><input id="tuDues" type="number" inputmode="decimal"><button class="btn sec" id="tuAll" type="button" style="margin-top:8px;width:100%">Clear all ₹' + money(owedS) + '</button></div><div id="tuPick" class="small" style="margin:4px 0 8px"></div>' : '') +
+    '<div id="tuMsg" class="small" style="margin:4px 0"></div>' +
+    '<div id="tuPrev" class="small" style="margin:4px 0 10px"></div><button class="btn huge green" id="tuGo" disabled>' + t('save') + '</button>');
   if ($('tuCount')) $('tuCount').onclick = function () { cashCheckModal('topup'); };
-  var tuPrev = function () { var a = Number($('tuAmt').value) || 0, adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0; $('tuPrev').innerHTML = (a > 0 || adj > 0) ? 'Fund ' + (a > 0 ? '<b>+₹' + money(a) + '</b> (cash in)' : 'no change (no cash)') + (adj > 0 ? ' · Loan <b>+₹' + money(adj) + '</b> (adjusted, no cash)' : '') : ''; };
-  $('tuAmt').oninput = tuPrev; if ($('tuAdj')) $('tuAdj').oninput = tuPrev; tuPrev();
-  $('tuGo').onclick = guard(async function () { var adj = $('tuAdj') ? (Number($('tuAdj').value) || 0) : 0, a = Number($('tuAmt').value) || 0; if (!(a > 0) && !(adj > 0)) return toast(t('amountBad'), true); if (a > 0 && adj > 0 && !window.confirm('Cash ₹' + money(a) + ' goes INTO the fund, and ₹' + money(adj) + ' is also added to the loan (no cash).\n\nIf no cash was actually handed over, press Cancel, clear the CASH field and save again.')) return; busy($('tuGo'), true); try { await rpc('add_fund', { p_household: ST.hh.id, p_amount: a, p_date: $('tuDate').value, p_source: $('tuSrc').value, p_note: $('tuNote').value.trim(), p_adjust_amount: adj }); } catch (e) { busy($('tuGo'), false); throw e; } closeModal(); toast(t('saved')); await refresh(); });
+  var srcKeep = 'shreyansh';
+  // whole entries, oldest first: the exact total, or the nearest whole totals either side of the amount
+  var pickFor = function (D) {
+    var cum = 0, res = { ok: false, lowS: 0, lowK: 0, highN: null, ids: [], list: [], sum: 0 };
+    for (var i = 0; i < pend.length; i++) {
+      cum += Number(pend[i].amount);
+      if (Math.abs(cum - D) < 0.005) return { ok: true, lowS: cum, lowK: i + 1, highN: null, ids: pend.slice(0, i + 1).map(function (e) { return e.id; }), list: pend.slice(0, i + 1), sum: cum };
+      if (cum > D) { res.highN = cum; break; }
+      res.lowS = cum; res.lowK = i + 1;
+    }
+    return res;
+  };
+  var numOf = function (id) { var el = $(id); if (!el || el.value === '') return 0; return Number(el.value); };
+  var read = function () {
+    var C = numOf('tuAmt'), D = numOf('tuDues'), errs = [], pick = null;
+    if (isNaN(C) || C < 0) errs.push('Cash cannot be negative.');
+    if (isNaN(D) || D < 0) errs.push('Dues cannot be negative.');
+    if (D > 0 && D > owedS + 0.005) errs.push('More than the ₹' + money(owedS) + ' the house owes Shreyansh.');
+    if (D > 0) {
+      pick = pickFor(D);
+      if (!pick.ok) {
+        if (pick.lowK > 0 && pick.highN !== null) errs.push('Oldest entries add up to ₹' + money(pick.lowS) + ' (' + pick.lowK + ' entries). Set the amount to ₹' + money(pick.lowS) + ', or ₹' + money(pick.highN) + ' to include the next one.');
+        else if (pick.lowK > 0) errs.push('Oldest entries add up to ₹' + money(pick.lowS) + ' (' + pick.lowK + ' entries). Set the amount to ₹' + money(pick.lowS) + '.');
+        else if (pend.length) errs.push('The oldest entry is ₹' + money(pend[0].amount) + '. Set the amount to ₹' + money(pend[0].amount) + ' to clear it.');
+        else errs.push('No unmarked entries to clear.');
+      }
+    }
+    if (legacyGap) errs.push('Unmarked entries add to ₹' + money(unmarkedAll) + ' but ₹' + money(owedS) + ' is owed. Earlier top-ups did not mark entries; that needs a one-time repair, which is not in this version.');
+    var dueErr = D > 0 && (D > owedS + 0.005 || !pick || !pick.ok || legacyGap);
+    var okSave = !(isNaN(C) || isNaN(D) || C < 0 || D < 0) && (C > 0 || D > 0) && !dueErr;
+    return { C: C, D: D, pick: pick, errs: errs, okSave: okSave };
+  };
+  var preview = function (r) {
+    var F0 = fund(), L = [];
+    if (r.C > 0) L.push('Cash in fund: <b>+₹' + money(r.C) + '</b> (₹' + money(F0) + ' → ₹' + money(F0 + r.C) + ')');
+    else if (r.D > 0) L.push('Fund: <b>unchanged</b> (no cash)');
+    else L.push('Cash in fund: no change');
+    if (r.D > 0) {
+      L.push('Dues owed to Shreyansh: ₹' + money(owedS) + ' → ₹' + money(owedS - r.D));
+      L.push('Entries marked settled: ' + (r.pick && r.pick.ok ? r.pick.ids.length + ' (₹' + money(r.pick.sum) + ')' : '—'));
+      L.push('Loan: <b>+₹' + money(r.D) + '</b> (interest applies)');
+      L.push('Free cash in hand: ₹' + money(free()) + ' → ₹' + money((F0 + r.C) - (dues() - r.D)));
+    }
+    return L.join('<br>');
+  };
+  // the source is Shreyansh (loan) whenever dues are being cleared; the business option is not offered then
+  var srcSync = function () {
+    var s = $('tuSrc');
+    if (!s) return;
+    if (numOf('tuDues') > 0) {
+      if (s.options.length !== 1) { srcKeep = s.value || 'shreyansh'; s.innerHTML = srcOpts(true); }
+      s.value = 'shreyansh';
+    } else if (s.options.length === 1) { s.innerHTML = srcOpts(false); s.value = srcKeep; }
+  };
+  var calc = function () {
+    srcSync();
+    var r = read();
+    $('tuMsg').innerHTML = r.errs.map(function (x) { return '<span class="err">' + esc(x) + '</span>'; }).join('<br>');
+    $('tuPrev').innerHTML = (r.C > 0 || r.D > 0) ? preview(r) : '';
+    if ($('tuPick')) $('tuPick').innerHTML = (r.D > 0 && r.pick && r.pick.ok) ? '<b>Entries to mark settled (oldest first):</b><br>' + r.pick.list.map(function (e) { return esc(prettyDate(e.expense_date)) + ' · ' + esc(catName(e.category)) + ' · ₹' + money(e.amount); }).join('<br>') : '';
+    $('tuGo').disabled = !r.okSave;
+    return r;
+  };
+  $('tuSrc').onchange = function () { if ($('tuSrc').options.length > 1) srcKeep = $('tuSrc').value; };
+  $('tuAmt').oninput = calc;
+  if ($('tuDues')) $('tuDues').oninput = calc;
+  if ($('tuAll')) $('tuAll').onclick = function () { $('tuDues').value = String(owedS); calc(); };
+  calc();
+  $('tuGo').onclick = guard(async function () {
+    var r = calc();
+    if (!r.okSave) return toast(r.errs[0] || t('amountBad'), true);
+    var C = r.C, D = r.D, note = $('tuNote').value.trim();
+    if (C > 0 && D > 0 && !window.confirm('Cash ₹' + money(C) + ' goes INTO the fund. Dues ₹' + money(D) + ' are cleared with no cash, and the loan rises by ₹' + money(D) + '. Both will be saved. Continue?')) return;
+    if (C === 0 && D > 0 && !window.confirm('Clear dues of ₹' + money(D) + ' with no cash? The picked entries are marked settled, and the loan rises by ₹' + money(D) + '.')) return;
+    var args = { p_household: ST.hh.id, p_amount: C, p_date: $('tuDate').value, p_source: D > 0 ? 'shreyansh' : $('tuSrc').value, p_note: note, p_adjust_ids: D > 0 ? r.pick.ids : null, p_adjust_amount: D > 0 ? r.pick.sum : 0 };
+    busy($('tuGo'), true);
+    try { await rpc('add_fund', args); } catch (e) { busy($('tuGo'), false); throw e; }
+    closeModal(); toast(t('saved')); await refresh();
+  });
 }
 function repayModal() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today());
