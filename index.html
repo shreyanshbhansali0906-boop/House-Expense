@@ -64,12 +64,27 @@ input.date-big{font-size:22px!important;font-weight:700;text-align:center;paddin
 
 
 .cats.need{outline:3px solid var(--rust);outline-offset:4px;border-radius:10px}
+
+/* shopping list card (v15.6): tap targets at least 44px, fits 412px wide */
+.shop-card .shop-add{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;margin:0 0 6px}
+.shop-in{flex:1 1 180px;min-width:0;min-height:44px;padding:10px 11px;border:1px solid var(--rule);border-radius:8px;background:#fff;color:var(--ink);font-size:16px;font-family:inherit}
+.shop-in:focus{outline:2px solid rgba(166,129,60,.3);border-color:var(--gold)}
+.shop-btn{min-height:44px;min-width:44px;padding:10px 14px;font-size:15px}
+.shop-link{display:inline-flex;align-items:center;min-height:44px;padding:0 2px;color:var(--maroon);font-weight:700;font-size:14px}
+.shop-note-box{margin:0 0 6px}.shop-note-box .shop-in{width:100%}
+.shop-it{cursor:default;flex-wrap:wrap}
+.shop-it .tx{flex:1 1 150px}
+.shop-it .tx b{white-space:normal;overflow-wrap:anywhere}
+.shop-note{display:block;color:var(--soft);font-size:13px;overflow-wrap:anywhere}
+.shop-btns{flex:0 0 auto;justify-content:flex-end}
+.shop-empty{padding:6px 2px 2px;font-size:14px}
+.shop-sub{margin:12px 0 4px;font-size:12px;font-weight:700;color:var(--soft)}
 </style>
 </head>
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v15.5 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15.6 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -190,7 +205,20 @@ var T = {
   rpUnchecked: { en: 'Entries not yet checked', hg: 'Check baaki entries', hi: 'जाँच बाकी खर्चे' }, rpLimit: { en: 'Fund limit', hg: 'Fund limit', hi: 'फंड सीमा' },
   newPwMsg: { en: 'New password for the Ghar Kharcha app: {p}\nLink: {u}', hg: 'Ghar Kharcha app ka naya password: {p}\nLink: {u}', hi: 'घर खर्चा ऐप का नया पासवर्ड: {p}\nलिंक: {u}' },
   textSize: { en: 'Text', hg: 'Akshar', hi: 'अक्षर' },
-  correct: { en: 'Correction', hg: 'Sudhaar', hi: 'सुधार' }
+  correct: { en: 'Correction', hg: 'Sudhaar', hi: 'सुधार' },
+  shopTitle: { en: '🛒 Shopping list', hg: '🛒 Shopping list', hi: '🛒 खरीदारी की सूची' },
+  shopPh: { en: 'Add an item, e.g. atta 5 kg', hg: 'Add an item, e.g. atta 5 kg', hi: 'सामान लिखें, जैसे atta 5 kg' },
+  shopAdd: { en: 'Add', hg: 'Add', hi: 'जोड़ें' },
+  shopNoteLink: { en: '+ note', hg: '+ note', hi: '+ नोट' },
+  shopNotePh: { en: 'Note, e.g. brand or size (optional)', hg: 'Note, jaise brand ya size (zaroori nahi)', hi: 'नोट, जैसे ब्रांड या साइज़ (ज़रूरी नहीं)' },
+  shopBuy: { en: '✓ Bought', hg: '✓ Kharid liya', hi: '✓ खरीद लिया' },
+  shopRemove: { en: 'Remove', hg: 'Hatao', hi: 'हटाएँ' },
+  shopUndo: { en: 'Undo', hg: 'Undo', hi: 'वापस करें' },
+  shopEmpty: { en: 'Nothing on the list. Add what the house needs.', hg: 'List khaali hai. Jo chahiye woh add karein.', hi: 'सूची खाली है। जो चाहिए वो जोड़ें।' },
+  shopAddedBy: { en: 'added by {n}, {t}', hg: '{n} ne joda, {t}', hi: '{n} ने जोड़ा, {t}' },
+  shopBoughtBy: { en: 'bought by {n}', hg: '{n} ne kharida', hi: '{n} ने खरीदा' },
+  shopToday: { en: 'Bought today', hg: 'Aaj kharida', hi: 'आज खरीदा' },
+  shopRemoveAsk: { en: 'Remove "{n}" from the list?', hg: '"{n}" list se hatayein?', hi: '"{n}" सूची से हटाएँ?' }
 };
 var DBMSG = [
   [/^Aage ki tareekh nahi chalegi$/, 'Future dates are not allowed', 'आगे की तारीख नहीं चलेगी'],
@@ -239,7 +267,14 @@ var DBMSG = [
   [/^Ye entry hataayi ja chuki hai$/, 'This entry has been removed', 'यह एंट्री हटाई जा चुकी है'],
   [/^Ye is ghar ka member nahi hai$/, 'Not a member of this household', 'इस घर का सदस्य नहीं है'],
   [/^Ye naam list mein nahi hai$/, 'This name is not in the list', 'यह नाम सूची में नहीं है'],
-  [/^Galat (role|bhasha)$/, 'Invalid value', 'गलत मान']
+  [/^Galat (role|bhasha)$/, 'Invalid value', 'गलत मान'],
+  [/^Not a member of this household$/, 'Not a member of this household', 'इस घर का सदस्य नहीं है'],
+  [/^Item name is required \(up to 80 characters\)$/, 'Item name is required (up to 80 characters)', 'सामान का नाम लिखें (80 अक्षर तक)'],
+  [/^Note is too long \(up to 200 characters\)$/, 'Note is too long (up to 200 characters)', 'नोट बहुत लंबा है (200 अक्षर तक)'],
+  [/^Already on the list: (.+)$/, 'Already on the list: $1', 'सूची में पहले से है: $1'],
+  [/^Item not found$/, 'Item not found', 'सामान सूची में नहीं मिला'],
+  [/^Only the person who added it, or an owner\/admin, can remove it$/, 'Only the person who added it, or an owner/admin, can remove it', 'इसे वही हटा सकता है जिसने जोड़ा, या Superuser'],
+  [/^Say whether it is bought or not$/, 'Say whether it is bought or not', 'बताएँ: खरीदा है या नहीं']
 ];
 function dbMsg(m) { m = String(m || ''); if (LANG === 'hg') return m; for (var i = 0; i < DBMSG.length; i++) { var r = DBMSG[i]; if (r[0].test(m)) return m.replace(r[0], LANG === 'hi' ? r[2] : r[1]); } return m; }
 var NOTEMAP = [[/^Diya: /, 'Given to ', 'दिए: '], [/^Wapas mila: /, 'Returned by ', 'वापस मिले: '], [/^Chukaaya: /, 'Paid back: ', 'चुकाया: '], [/^Top-up mein adjust/, 'Adjusted in top-up', 'टॉप-अप में एडजस्ट'],
@@ -461,7 +496,7 @@ if (typeof module !== 'undefined') module.exports = { hiText: hiText, dbMsg: dbM
 </script>
 <script>/* ===== Ghar Kharcha v14 — app (screens + actions) ===== */
 var sb = null, sbPromise = null, chan = null, reloadTimer = null;
-var ST = { user: null, status: null, hh: null, role: null, viewAs: null, wallet: { fund: 0 }, expenses: [], txs: [], settlements: [], closes: [], checks: [], team: [], suggestions: [], backups: [], more: {}, f: { q: '', m: 'ALL', c: 'ALL', cc: 'ALL', s: 'ALL' }, authTab: 'login', loading: true };
+var ST = { user: null, status: null, hh: null, role: null, viewAs: null, wallet: { fund: 0 }, expenses: [], txs: [], settlements: [], closes: [], checks: [], team: [], suggestions: [], backups: [], shop: { open: [], today: [] }, shopDraft: { name: '', note: '', open: false }, more: {}, f: { q: '', m: 'ALL', c: 'ALL', cc: 'ALL', s: 'ALL' }, authTab: 'login', loading: true };
 var DEF_LANG = { owner: 'en', admin: 'hg', member: 'hi', guest: 'hg', pending: 'hg' };
 var ROLE_LBL = { owner: 'Superuser', admin: 'Supervisor', member: 'House Manager', guest: 'Guest', pending: 'Pending' };
 function $(id) { return document.getElementById(id); }
@@ -520,7 +555,7 @@ async function boot() {
   } catch (e) { ST.loading = false; ST.fatal = e.message; render(); }
 }
 
-function resetState() { var k = ST.authTab; ST = { user: null, status: null, hh: null, role: null, viewAs: null, wallet: { fund: 0 }, expenses: [], txs: [], settlements: [], closes: [], checks: [], team: [], suggestions: [], backups: [], more: {}, f: { q: '', m: 'ALL', c: 'ALL', cc: 'ALL', s: 'ALL' }, authTab: k, loading: false }; if (chan && sb) { try { sb.removeChannel(chan); } catch (e) { } } chan = null; LANG = 'hg'; }
+function resetState() { var k = ST.authTab; ST = { user: null, status: null, hh: null, role: null, viewAs: null, wallet: { fund: 0 }, expenses: [], txs: [], settlements: [], closes: [], checks: [], team: [], suggestions: [], backups: [], shop: { open: [], today: [] }, shopDraft: { name: '', note: '', open: false }, more: {}, f: { q: '', m: 'ALL', c: 'ALL', cc: 'ALL', s: 'ALL' }, authTab: k, loading: false }; if (chan && sb) { try { sb.removeChannel(chan); } catch (e) { } } chan = null; LANG = 'hg'; }
 async function afterLogin(user) {
   ST.user = user; ST.loading = true; render();
   ST.status = await rpc('my_status');
@@ -540,11 +575,14 @@ async function loadAll() {
     q(sb.from('suggestions').select('*').eq('household_id', h).order('created_at', { ascending: false }).limit(50)),
     adm ? rpc('team_list', { p_household: h }) : Promise.resolve([]),
     adm ? q(sb.from('backups').select('id,created_at,kind').eq('household_id', h).order('created_at', { ascending: false }).limit(12)) : Promise.resolve([]),
-    ST.role === 'owner' ? rpc('alert_status', { p_household: h }) : Promise.resolve(null)
+    ST.role === 'owner' ? rpc('alert_status', { p_household: h }) : Promise.resolve(null),
+    q(sb.from('shopping_items').select('*').eq('household_id', h).is('removed_at', null).is('bought_at', null).order('added_at', { ascending: true }).limit(1000)),
+    q(sb.from('shopping_items').select('*').eq('household_id', h).is('removed_at', null).gte('bought_at', shopDayStart()).order('bought_at', { ascending: false }).limit(200))
   ];
   var r = await Promise.all(jobs.map(function (p) { return p.catch(function (e) { console.warn(e); return null; }); }));
   ST.wallet = r[0] || { fund: 0 }; ST.expenses = r[1] || []; ST.txs = r[2] || []; ST.settlements = r[3] || []; ST.closes = r[4] || []; ST.checks = r[5] || [];
   ST.suggestions = r[6] || []; ST.team = r[7] || []; ST.backups = r[8] || []; ST.alert = r[9] || null;
+  ST.shop = { open: r[10] || [], today: r[11] || [] };
 }
 function subscribe() {
   try {
@@ -613,7 +651,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + (ST.viewName ? ' · ' + ST.viewName : '') + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
-  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.5 · cloud synced'; hiWalk(ft); }
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.6 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function alertLine(lbl, x, isWa) {
@@ -688,6 +726,31 @@ function monthSummaryCard() {
   return '<div class="card"><div class="stats"><div class="stat"><span>' + t('thisMonth') + '</span><b>₹' + money(a) + '</b></div><div class="stat"><span>' + t('lastMonth') + '</span><b>₹' + money(b) + '</b></div></div></div>';
 }
 
+/* --- shopping list (v15.6): anyone in the house adds items and ticks them bought. No money is recorded here. --- */
+function canShop() { return !ST.viewAs && !!ST.user && (ST.role === 'owner' || ST.role === 'admin' || ST.role === 'member' || ST.role === 'guest'); }
+function canRemoveShop(x) { return canShop() && (x.added_by === ST.user.id || ST.role === 'owner' || ST.role === 'admin'); }
+function shopDayStart() { return new Date(today() + 'T00:00:00').toISOString(); }
+function shopTime(s) { return s ? new Date(s).toLocaleString(LANG === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; }
+function shoppingCard() {
+  var sh = ST.shop || { open: [], today: [] }, dr = ST.shopDraft || { name: '', note: '', open: false }, can = canShop();
+  var openRows = sh.open.map(function (x) {
+    var btns = can ? '<button class="btn green shop-btn" data-a="shopBought" data-id="' + esc(x.id) + '">' + t('shopBuy') + '</button>' : '';
+    if (canRemoveShop(x)) btns += '<button class="btn sec shop-btn" data-a="shopRemove" data-id="' + esc(x.id) + '" data-n="' + esc(x.name) + '">' + t('shopRemove') + '</button>';
+    return '<div class="it shop-it"><div class="tx"><b>' + esc(x.name) + '</b>' + (x.note ? '<small class="shop-note">' + esc(x.note) + '</small>' : '') +
+      '<small>' + t('shopAddedBy', { t: esc(shopTime(x.added_at)) }).split('{n}').join(esc(x.added_by_name || '')) + '</small></div>' +
+      (btns ? '<div class="row shop-btns">' + btns + '</div>' : '') + '</div>';
+  }).join('');
+  var todayRows = sh.today.map(function (x) {
+    return '<div class="it shop-it"><div class="tx"><b>' + esc(x.name) + '</b><small>' + t('shopBoughtBy').split('{n}').join(esc(x.bought_by_name || '')) + '</small></div>' +
+      (can ? '<div class="row shop-btns"><button class="btn sec shop-btn" data-a="shopUndo" data-id="' + esc(x.id) + '">' + t('shopUndo') + '</button></div>' : '') + '</div>';
+  }).join('');
+  var add = can ? '<div class="shop-add"><input id="shItem" class="shop-in" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="' + esc(t('shopPh')) + '" value="' + esc(dr.name) + '"><button class="btn shop-btn" id="shAddBtn" data-a="shopAdd">' + t('shopAdd') + '</button></div>' +
+    '<div><a href="#" class="shop-link" data-a="shopNote">' + t('shopNoteLink') + '</a><div id="shNoteBox" class="shop-note-box"' + (dr.open ? '' : ' style="display:none"') + '><input id="shNote" class="shop-in" type="text" maxlength="200" autocomplete="off" placeholder="' + esc(t('shopNotePh')) + '" value="' + esc(dr.note) + '"></div></div>' : '';
+  return '<div class="card shop-card"><h2>' + t('shopTitle') + (can ? '' : ' <span class="chip">' + t('viewOnly') + '</span>') + '</h2>' + add +
+    (openRows ? '<div class="list">' + openRows + '</div>' : '<div class="muted shop-empty">' + t('shopEmpty') + '</div>') +
+    (todayRows ? '<div class="shop-today"><div class="shop-sub">' + t('shopToday') + '</div><div class="list">' + todayRows + '</div></div>' : '') + '</div>';
+}
+
 /* ---------- screens ---------- */
 function viewLogin() {
   var L = ST.authTab;
@@ -717,7 +780,7 @@ function viewPending() {
 function viewMamta() {
   return header() + lowCashBanner() + cashCard(true) +
     '<button class="btn huge" data-a="addExp" style="margin-bottom:13px">' + t('addExpense') + '</button>' +
-    duesCard() + recentCard() + monthSummaryCard() +
+    shoppingCard() + duesCard() + recentCard() + monthSummaryCard() +
     '<div class="card"><button class="btn sec" data-a="passbookRO">📒 ' + t('passbook') + '</button></div>';
 }
 function todoCard() {
@@ -731,10 +794,10 @@ function todoCard() {
 function viewShrey() {
   return header() + lowCashBanner() + todoCard() + cashCard() +
     '<div class="card"><div class="actions"><button class="btn" data-a="addExp">' + t('addExpense') + '</button><button class="btn green" data-a="topup">' + t('addTopup') + '</button><button class="btn sec" data-a="cashCheck">💰 ' + t('cashCount') + '</button><button class="btn sec" data-a="report">📤 ' + t('sendReport') + '</button></div></div>' +
-    duesCard() + recentCard() + monthSummaryCard() + ccCard() + backupsCard();
+    shoppingCard() + duesCard() + recentCard() + monthSummaryCard() + ccCard() + backupsCard();
 }
 function viewGuest() {
-  return header('<span class="chip">' + t('viewOnly') + '</span>') + monthSummaryCard() + chartsCard() + ccCard() + recentCard() + suggestionsCard();
+  return header('<span class="chip">' + t('viewOnly') + '</span>') + shoppingCard() + monthSummaryCard() + chartsCard() + ccCard() + recentCard() + suggestionsCard();
 }
 function viewOwner() {
   var lb = loanBook(ST.txs, ST.hh.loan_rates, today()), u = unverified(), a = pendingApprovals(), pend = ST.team.filter(function (m) { return m.role === 'pending'; });
@@ -747,7 +810,7 @@ function viewOwner() {
   return header(sel) + al +
     '<div class="card"><div class="stats"><div class="stat"><span>Fund</span><b>₹' + money(fund()) + '</b></div><div class="stat"><span>Really free</span><b>₹' + money(free()) + '</b></div><div class="stat"><span>Owed to people</span><b>₹' + money(dues()) + '</b></div><div class="stat"><span>' + t('cashWithPeople') + '</span><b>₹' + money(advances()) + '</b></div><div class="stat"><span>Loan payable</span><b>₹' + money(Math.round(lb.balance)) + '</b></div></div>' +
     '<div class="actions" style="margin-top:11px"><button class="btn" data-a="addExp">+ Expense</button><button class="btn green" data-a="topup">+ Top-up</button><button class="btn sec" data-a="repay">' + t('loanRepay') + '</button><button class="btn sec" data-a="fundFix">' + t('fundFix') + '</button><button class="btn sec" data-a="cashCheck">💰 ' + t('cashCount') + '</button><button class="btn sec" data-a="report">📤 ' + t('sendReport') + '</button></div></div>' +
-    insightsCard() + duesCard() + todoCard() + passbookCard(lb) + entriesCard() + ccCard() + chartsCard() + closeCard() + historyCard() + teamCard() + settingsCard() + backupsCard() + suggestionsCard() + exportCard();
+    shoppingCard() + insightsCard() + duesCard() + todoCard() + passbookCard(lb) + entriesCard() + ccCard() + chartsCard() + closeCard() + historyCard() + teamCard() + settingsCard() + backupsCard() + suggestionsCard() + exportCard();
 }
 
 /* --- owner cards --- */
@@ -1308,7 +1371,24 @@ var A = {
   addRate: async function () { var f = $('rateFrom').value, v = Number($('rateVal').value); if (!f || !(v >= 0)) return; var rates = (ST.hh.loan_rates || []).filter(function (r) { return r.from !== f; }).concat([{ from: f, rate: v }]); await rpc('update_household', { p_household: ST.hh.id, p_loan_rates: rates }); toast('Rate saved'); await refresh(); },
   saveAlert: async function () { var v = $('alThr').value.trim(); var r = await rpc('set_fund_alert', { p_household: ST.hh.id, p_threshold: v === '' ? null : Number(v), p_phone: $('alPhone').value.trim() || null }); toast(r.sent_now ? 'Saved — fund is already below the limit, alert sent' : 'Alert saved'); await refresh(); },
   testAlert: async function () { await rpc('test_fund_alert', { p_household: ST.hh.id }); toast(t('alTestSent')); },
-  ccEdit: async function () { var v = prompt('Cost centres (comma separated):', ccList().join(', ')); if (v === null) return; var list = uniq(v.split(',').map(function (x) { return x.trim(); })); if (list.indexOf('Household') < 0) list.unshift('Household'); await rpc('set_cost_centres', { p_household: ST.hh.id, p_list: list }); await refresh(); }
+  ccEdit: async function () { var v = prompt('Cost centres (comma separated):', ccList().join(', ')); if (v === null) return; var list = uniq(v.split(',').map(function (x) { return x.trim(); })); if (list.indexOf('Household') < 0) list.unshift('Household'); await rpc('set_cost_centres', { p_household: ST.hh.id, p_list: list }); await refresh(); },
+  shopNote: function () { var b = $('shNoteBox'); if (!b) return; ST.shopDraft.open = !ST.shopDraft.open; if (!ST.shopDraft.open) { ST.shopDraft.note = ''; if ($('shNote')) $('shNote').value = ''; } b.style.display = ST.shopDraft.open ? '' : 'none'; if (ST.shopDraft.open && $('shNote')) $('shNote').focus(); },
+  shopAdd: async function (el) {
+    var inp = $('shItem'), nt = $('shNote'), nm = inp ? inp.value.trim() : '', note = nt ? nt.value.trim() : '';
+    if (!nm) { if (inp) inp.focus(); return; }
+    busy(el, true);
+    try { await rpc('shopping_add', { p_household: ST.hh.id, p_name: nm, p_note: note || null }); } finally { busy(el, false); }
+    ST.shopDraft = { name: '', note: '', open: false };
+    await refresh();
+    toast('✓');
+    if ($('shItem')) $('shItem').focus();
+  },
+  shopBought: async function (el) { busy(el, true); try { await rpc('shopping_set_bought', { p_id: el.dataset.id, p_bought: true }); } finally { busy(el, false); } await refresh(); toast('✓'); },
+  shopUndo: async function (el) { busy(el, true); try { await rpc('shopping_set_bought', { p_id: el.dataset.id, p_bought: false }); } finally { busy(el, false); } await refresh(); toast('✓'); },
+  shopRemove: async function (el) {
+    if (!(await confirmBox(t('shopRemoveAsk').split('{n}').join(el.dataset.n || ''), t('shopRemove')))) return;
+    busy(el, true); try { await rpc('shopping_remove', { p_id: el.dataset.id }); } finally { busy(el, false); } await refresh(); toast('✓');
+  }
 };
 document.addEventListener('click', function (ev) {
   var el = ev.target.closest('[data-a]'); if (!el || el.tagName === 'SELECT') return;
@@ -1324,6 +1404,8 @@ document.addEventListener('change', function (ev) {
 });
 document.addEventListener('input', function (ev) { var el = ev.target; if (el.dataset.f === 'q') { ST.f.q = el.value; clearTimeout(ST._qt); ST._qt = setTimeout(function () { render(); var i = document.querySelector('[data-f="q"]'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 350); } });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target && (ev.target.id === 'auPass')) { var b = document.querySelector('[data-a="login"],[data-a="signup"]'); if (b) b.click(); } });
+document.addEventListener('input', function (ev) { var el = ev.target; if (el.id === 'shItem') ST.shopDraft.name = el.value; else if (el.id === 'shNote') ST.shopDraft.note = el.value; });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target && (ev.target.id === 'shItem' || ev.target.id === 'shNote')) { ev.preventDefault(); var b = $('shAddBtn'); if (b && !b.disabled) b.click(); } });
 window.addEventListener('error', function (e) { toast('Error: ' + (e.message || ''), true); });
 window.addEventListener('unhandledrejection', function (e) { showErr(e.reason); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () { });
