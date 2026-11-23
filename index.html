@@ -79,12 +79,14 @@ input.date-big{font-size:22px!important;font-weight:700;text-align:center;paddin
 .shop-btns{flex:0 0 auto;justify-content:flex-end}
 .shop-empty{padding:6px 2px 2px;font-size:14px}
 .shop-sub{margin:12px 0 4px;font-size:12px;font-weight:700;color:var(--soft)}
+.shop-edit{flex:0 0 100%;display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.shop-edit .shop-in{flex:0 0 auto;width:100%}
 </style>
 </head>
 <body>
 <div class="shell"><div class="topline"></div><div class="brand"><div class="eyebrow">Ghar ka hisaab</div><h1>Ghar Kharcha</h1></div>
 <div id="app"></div>
-<div class="footer">Ghar Kharcha Online v15.6 · cloud synced</div></div>
+<div class="footer">Ghar Kharcha Online v15.7 · cloud synced</div></div>
 <script>/* ===== Ghar Kharcha v14 — core (no DOM): config, language, money logic ===== */
 var CFG = { url: 'https://yyougdbsngqsudcouvys.supabase.co', key: 'sb_publishable_pP6dgph_OgDwIlkdFKDnPA_j1MoTHJE', version: 'v14' };
 
@@ -214,6 +216,9 @@ var T = {
   shopBuy: { en: '✓ Bought', hg: '✓ Kharid liya', hi: '✓ खरीद लिया' },
   shopRemove: { en: 'Remove', hg: 'Hatao', hi: 'हटाएँ' },
   shopUndo: { en: 'Undo', hg: 'Undo', hi: 'वापस करें' },
+  shopEdit: { en: 'Edit', hg: 'Badlo', hi: 'बदलें' },
+  shopSave: { en: 'Save', hg: 'Save', hi: 'सेव करें' },
+  shopCancel: { en: 'Cancel', hg: 'Cancel', hi: 'रद्द करें' },
   shopEmpty: { en: 'Nothing on the list. Add what the house needs.', hg: 'List khaali hai. Jo chahiye woh add karein.', hi: 'सूची खाली है। जो चाहिए वो जोड़ें।' },
   shopAddedBy: { en: 'added by {n}, {t}', hg: '{n} ne joda, {t}', hi: '{n} ने जोड़ा, {t}' },
   shopBoughtBy: { en: 'bought by {n}', hg: '{n} ne kharida', hi: '{n} ने खरीदा' },
@@ -274,7 +279,9 @@ var DBMSG = [
   [/^Already on the list: (.+)$/, 'Already on the list: $1', 'सूची में पहले से है: $1'],
   [/^Item not found$/, 'Item not found', 'सामान सूची में नहीं मिला'],
   [/^Only the person who added it, or an owner\/admin, can remove it$/, 'Only the person who added it, or an owner/admin, can remove it', 'इसे वही हटा सकता है जिसने जोड़ा, या Superuser'],
-  [/^Say whether it is bought or not$/, 'Say whether it is bought or not', 'बताएँ: खरीदा है या नहीं']
+  [/^Only the person who wrote the note can change it$/, 'Only the person who wrote the note can change it', 'सिर्फ़ वही व्यक्ति नोट बदल सकता है जिसने इसे लिखा।'],
+  [/^Bought items cannot be edited\. Undo the purchase first$/, 'Bought items cannot be edited. Undo the purchase first', 'खरीदा हुआ सामान नहीं बदला जा सकता। पहले वापस करें'],
+  [/^Say whether it is bought or not$/, 'Say whether it is bought or not','बताएँ: खरीदा है या नहीं']
 ];
 function dbMsg(m) { m = String(m || ''); if (LANG === 'hg') return m; for (var i = 0; i < DBMSG.length; i++) { var r = DBMSG[i]; if (r[0].test(m)) return m.replace(r[0], LANG === 'hi' ? r[2] : r[1]); } return m; }
 var NOTEMAP = [[/^Diya: /, 'Given to ', 'दिए: '], [/^Wapas mila: /, 'Returned by ', 'वापस मिले: '], [/^Chukaaya: /, 'Paid back: ', 'चुकाया: '], [/^Top-up mein adjust/, 'Adjusted in top-up', 'टॉप-अप में एडजस्ट'],
@@ -583,6 +590,7 @@ async function loadAll() {
   ST.wallet = r[0] || { fund: 0 }; ST.expenses = r[1] || []; ST.txs = r[2] || []; ST.settlements = r[3] || []; ST.closes = r[4] || []; ST.checks = r[5] || [];
   ST.suggestions = r[6] || []; ST.team = r[7] || []; ST.backups = r[8] || []; ST.alert = r[9] || null;
   ST.shop = { open: r[10] || [], today: r[11] || [] };
+  if (ST.shopEdit && !ST.shop.open.some(function (x) { return x.id === ST.shopEdit.id; })) ST.shopEdit = null;
 }
 function subscribe() {
   try {
@@ -623,7 +631,7 @@ function applySize() { render(); }
 var lastRefresh = 0;
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && ST.user && ST.role && Date.now() - lastRefresh > 15000) refresh(); });
 window.addEventListener('pageshow', function (e) { if (e.persisted && ST.user) refresh(); });
-setInterval(function () { if (document.visibilityState === 'visible' && ST.user && ST.role && ST.role !== 'pending' && !$('modal') && Date.now() - lastRefresh > 120000) refresh(); }, 30000);
+setInterval(function () { if (document.visibilityState === 'visible' && ST.user && ST.role && ST.role !== 'pending' && !$('modal') && !ST.shopEdit && Date.now() - lastRefresh > 120000) refresh(); }, 30000);
 /* ---------- render ---------- */
 /* Hindi: translate the English-only owner/admin labels as they appear */
 function hiWalk(root) {
@@ -651,7 +659,7 @@ function render() { var eb = document.querySelector('.brand .eyebrow'); if (eb) 
   else { var r = role(); v = (ST.viewAs ? '<div class="preview"><span>👁 Preview: ' + ROLE_LBL[r] + (ST.viewName ? ' · ' + ST.viewName : '') + ' screen</span><button class="btn sec mini" data-a="viewAs" data-v="">Back to mine</button></div>' : '') + (r === 'member' ? viewMamta() : r === 'admin' ? viewShrey() : r === 'guest' ? viewGuest() : viewOwner()); }
   app.innerHTML = v;
   var sh = document.querySelector('.shell'); if (sh) sh.style.zoom = zoomVal() === 1 ? '' : String(zoomVal());
-  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.6 · cloud synced'; hiWalk(ft); }
+  var ft = document.querySelector('.footer'); if (ft) { ft.textContent = 'Ghar Kharcha Online v15.7 · cloud synced'; hiWalk(ft); }
   document.documentElement.lang = LANG === 'hi' ? 'hi' : 'en';
 }
 function alertLine(lbl, x, isWa) {
@@ -734,11 +742,15 @@ function shopTime(s) { return s ? new Date(s).toLocaleString(LANG === 'hi' ? 'hi
 function shoppingCard() {
   var sh = ST.shop || { open: [], today: [] }, dr = ST.shopDraft || { name: '', note: '', open: false }, can = canShop();
   var openRows = sh.open.map(function (x) {
+    var mine = can && x.added_by === ST.user.id;   // only the writer of the note can change it
+    var editing = mine && !!ST.shopEdit && ST.shopEdit.id === x.id;
     var btns = can ? '<button class="btn green shop-btn" data-a="shopBought" data-id="' + esc(x.id) + '">' + t('shopBuy') + '</button>' : '';
+    if (mine && !editing) btns += '<button class="btn sec shop-btn" data-a="shopEdit" data-id="' + esc(x.id) + '">' + t('shopEdit') + '</button>';
     if (canRemoveShop(x)) btns += '<button class="btn sec shop-btn" data-a="shopRemove" data-id="' + esc(x.id) + '" data-n="' + esc(x.name) + '">' + t('shopRemove') + '</button>';
-    return '<div class="it shop-it"><div class="tx"><b>' + esc(x.name) + '</b>' + (x.note ? '<small class="shop-note">' + esc(x.note) + '</small>' : '') +
+    var edit = editing ? '<div class="shop-edit"><input id="shEditNote" class="shop-in" type="text" maxlength="200" autocomplete="off" placeholder="' + esc(t('shopNotePh')) + '" value="' + esc(ST.shopEdit.text) + '"><div class="row shop-btns"><button class="btn shop-btn" data-a="shopEditSave" data-id="' + esc(x.id) + '">' + t('shopSave') + '</button><button class="btn sec shop-btn" data-a="shopEditCancel">' + t('shopCancel') + '</button></div></div>' : '';
+    return '<div class="it shop-it"><div class="tx"><b>' + esc(x.name) + '</b>' + (x.note && !editing ? '<small class="shop-note">' + esc(x.note) + '</small>' : '') +
       '<small>' + t('shopAddedBy', { t: esc(shopTime(x.added_at)) }).split('{n}').join(esc(x.added_by_name || '')) + '</small></div>' +
-      (btns ? '<div class="row shop-btns">' + btns + '</div>' : '') + '</div>';
+      (btns ? '<div class="row shop-btns">' + btns + '</div>' : '') + edit + '</div>';
   }).join('');
   var todayRows = sh.today.map(function (x) {
     return '<div class="it shop-it"><div class="tx"><b>' + esc(x.name) + '</b><small>' + t('shopBoughtBy').split('{n}').join(esc(x.bought_by_name || '')) + '</small></div>' +
@@ -1388,6 +1400,14 @@ var A = {
   shopRemove: async function (el) {
     if (!(await confirmBox(t('shopRemoveAsk').split('{n}').join(el.dataset.n || ''), t('shopRemove')))) return;
     busy(el, true); try { await rpc('shopping_remove', { p_id: el.dataset.id }); } finally { busy(el, false); } await refresh(); toast('✓');
+  },
+  shopEdit: function (el) { var it = ((ST.shop && ST.shop.open) || []).find(function (x) { return x.id === el.dataset.id; }); ST.shopEdit = { id: el.dataset.id, text: it && it.note ? it.note : '' }; render(); var i = $('shEditNote'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } },
+  shopEditCancel: function () { ST.shopEdit = null; render(); },
+  shopEditSave: async function (el) {
+    var inp = $('shEditNote'); if (!inp) return;
+    busy(el, true);
+    try { await rpc('shopping_set_note', { p_id: el.dataset.id, p_note: inp.value.trim() || null }); } finally { busy(el, false); }
+    ST.shopEdit = null; await refresh(); toast('✓');
   }
 };
 document.addEventListener('click', function (ev) {
@@ -1404,8 +1424,9 @@ document.addEventListener('change', function (ev) {
 });
 document.addEventListener('input', function (ev) { var el = ev.target; if (el.dataset.f === 'q') { ST.f.q = el.value; clearTimeout(ST._qt); ST._qt = setTimeout(function () { render(); var i = document.querySelector('[data-f="q"]'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 350); } });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target && (ev.target.id === 'auPass')) { var b = document.querySelector('[data-a="login"],[data-a="signup"]'); if (b) b.click(); } });
-document.addEventListener('input', function (ev) { var el = ev.target; if (el.id === 'shItem') ST.shopDraft.name = el.value; else if (el.id === 'shNote') ST.shopDraft.note = el.value; });
+document.addEventListener('input', function (ev) { var el = ev.target; if (el.id === 'shItem') ST.shopDraft.name = el.value; else if (el.id === 'shNote') ST.shopDraft.note = el.value; else if (el.id === 'shEditNote' && ST.shopEdit) ST.shopEdit.text = el.value; });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target && (ev.target.id === 'shItem' || ev.target.id === 'shNote')) { ev.preventDefault(); var b = $('shAddBtn'); if (b && !b.disabled) b.click(); } });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target && ev.target.id === 'shEditNote') { ev.preventDefault(); var b = document.querySelector('[data-a="shopEditSave"]'); if (b && !b.disabled) b.click(); } });
 window.addEventListener('error', function (e) { toast('Error: ' + (e.message || ''), true); });
 window.addEventListener('unhandledrejection', function (e) { showErr(e.reason); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () { });
